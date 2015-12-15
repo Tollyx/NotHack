@@ -13,5 +13,5 @@ private:
 	Map() {};
 	int m_iWidth;
 	int m_iHeight;
-	std::vector<int> m_aiTileMap;
+	int** m_aiTileMap;
 };

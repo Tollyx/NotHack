@@ -7,14 +7,24 @@ Map::Map(int p_iWidth, int p_iHeight)
 	m_iWidth = p_iWidth;
 	m_iHeight = p_iHeight;
 
-	for (int i = 0; i < m_iWidth * m_iHeight; i++)
+	m_aiTileMap = new int*[m_iWidth];
+	for (int x = 0; x < m_iWidth; x++)
 	{
-		m_aiTileMap.push_back(std::rand() % (16 * 16));
+		m_aiTileMap[x] = new int[m_iHeight];
+		for (int y = 0; y < m_iHeight; y++)
+		{
+			m_aiTileMap[x][y] = 178;
+		}
 	}
 }
 
 Map::~Map()
 {
+	for (int x = 0; x < m_iWidth; x++)
+	{
+		delete m_aiTileMap[x];
+	}
+	delete m_aiTileMap;
 }
 
 int Map::GetTile(int p_iX, int p_iY)
@@ -23,19 +33,19 @@ int Map::GetTile(int p_iX, int p_iY)
 	{
 		if (p_iY >= 0 && p_iY < m_iHeight)
 		{
-			return m_aiTileMap.at(p_iX % m_iWidth + p_iY * m_iHeight);
+			return m_aiTileMap[p_iX][p_iY];
 		}
 	}
-	return 0;
+	return '.';
 }
 
 void Map::SetTile(int p_iX, int p_iY, int p_iTile)
 {
-	if (p_iX >= 0 && p_iX < m_iWidth)
+	if (p_iX >= 0 && p_iX < m_iWidth - 1)
 	{
-		if (p_iY >= 0 && p_iY < m_iHeight)
+		if (p_iY >= 0 && p_iY < m_iHeight - 1)
 		{
-			m_aiTileMap.assign(p_iX % m_iWidth + p_iY * m_iHeight, p_iTile);
+			m_aiTileMap[p_iX][p_iY] = p_iTile;
 		}
 	}
 }
