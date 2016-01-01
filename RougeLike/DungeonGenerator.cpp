@@ -169,7 +169,8 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 		it++;
 	}*/
 	bool done = false;
-	while (!done)
+	int count = 0;
+	while (!done && count < 100)
 	{
 		done = true;
 		std::vector<SDL_Point> connectors;
@@ -223,15 +224,35 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 			dungeon->SetTile(connectors.at(rng), emptyTile);
 			FloodFill(connectors.at(rng), emptyTile, floorTile, dungeon);
 
-			if (rand() % 100 < 25)
+			// Gör ibland en extra öppning
+			if (rand() % 100 < 75)
 			{
 				connectors.erase(connectors.begin() + rng);
 				rng = rand() % connectors.size();
 				dungeon->SetTile(connectors.at(rng), emptyTile);
 				FloodFill(connectors.at(rng), emptyTile, floorTile, dungeon);
+				//Vänta, vad händer om...
+				if (rand() % 100 < 50)
+				{
+					connectors.erase(connectors.begin() + rng);
+					rng = rand() % connectors.size();
+					dungeon->SetTile(connectors.at(rng), emptyTile);
+					FloodFill(connectors.at(rng), emptyTile, floorTile, dungeon);
+					// om det händer igen?!
+					if (rand() % 100 < 25)
+					{
+						connectors.erase(connectors.begin() + rng);
+						rng = rand() % connectors.size();
+						dungeon->SetTile(connectors.at(rng), emptyTile);
+						FloodFill(connectors.at(rng), emptyTile, floorTile, dungeon);
+						// Men tänk... ok jag slutar.
+					}
+				}
 			}
 		}
+		count++;
 	}
+	printf("ConnectorCount: %i", count);
 	done = false;
 	while (!done)
 	{
@@ -266,9 +287,31 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 						done = false;
 					}
 				}
+				else if (dungeon->GetTile(x, y) == emptyTile)
+				{
+					dungeon->SetTile(x, y, 178);
+					done = false;
+				}
 			}
 		}
 	}
+
+	int entrRoom;
+	int exitRoom;
+
+	do
+	{
+		entrRoom = rand() % rooms.size();
+		exitRoom = rand() % rooms.size();
+	} while (entrRoom == exitRoom);
+
+	dungeon->SetTile(rooms.at(entrRoom).x + rand() % rooms.at(entrRoom).w,
+		rooms.at(entrRoom).y + rand() % rooms.at(entrRoom).h,
+		24);
+
+	dungeon->SetTile(rooms.at(exitRoom).x + rand() % rooms.at(exitRoom).w,
+		rooms.at(exitRoom).y + rand() % rooms.at(exitRoom).h,
+		25);
 
 	return dungeon;
 }

@@ -22,7 +22,7 @@ void GameState::Enter()
 	m_iScreenTileHeight = m_xSystem.m_iScreenHeight / 12;
 	m_iScreenTileWidth = m_xSystem.m_iScreenWidth / 12;
 
-	m_pxMap = DungeonGenerator::GenerateMap(m_iScreenTileWidth, m_iScreenTileHeight, 32, std::chrono::system_clock::now().time_since_epoch().count());
+	m_pxMap = DungeonGenerator::GenerateMap(m_iScreenTileWidth, m_iScreenTileHeight, 16, std::chrono::system_clock::now().time_since_epoch().count());
 
 	for (int i = 0; i < 16*16; i++)
 	{
