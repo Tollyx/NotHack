@@ -27,6 +27,11 @@ Map::~Map()
 	delete m_aiTileMap;
 }
 
+int Map::GetTile(SDL_Point pos)
+{
+	return GetTile(pos.x, pos.y);
+}
+
 int Map::GetTile(int p_iX, int p_iY)
 {
 	if (p_iX >= 0 && p_iX < m_iWidth)
@@ -36,7 +41,7 @@ int Map::GetTile(int p_iX, int p_iY)
 			return m_aiTileMap[p_iX][p_iY];
 		}
 	}
-	return '.';
+	return 0;
 }
 
 void Map::SetTile(int p_iX, int p_iY, int p_iTile)
@@ -48,6 +53,11 @@ void Map::SetTile(int p_iX, int p_iY, int p_iTile)
 			m_aiTileMap[p_iX][p_iY] = p_iTile;
 		}
 	}
+}
+
+void Map::SetTile(SDL_Point pos, int p_iTile)
+{
+	SetTile(pos.x, pos.y, p_iTile);
 }
 
 int Map::GetHeight()
