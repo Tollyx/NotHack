@@ -10,11 +10,14 @@ Player::Player(Tile p_Tile, int p_iX, int p_iY)
 	m_iHP = 10;
 	m_iSTR = 5;
 	m_iDEF = 5;
+	m_iXp = 0;
+	m_iLvl = 1; 
+	m_iNextLvl = 2;
 }
 
 void Player::Update()
 {
-
+	return;
 }
 
 Tile Player::GetTile()
@@ -30,6 +33,18 @@ int Player::Hurt(int p_iEnemySTR)
 	}
 	m_iHP -= dmg;
 	return dmg;
+}
+
+void Player::Move(int p_iX, int p_iY)
+{
+	m_iX += p_iX;
+	m_iY += p_iY;
+}
+
+void Player::SetPos(int p_iX, int p_iY)
+{
+	m_iX = p_iX;
+	m_iY = p_iY;
 }
 
 int Player::GetHP()
@@ -60,6 +75,34 @@ int Player::GetX()
 int Player::GetY()
 {
 	return m_iY;
+}
+
+void Player::AddXp(int p_iXp)
+{
+	m_iXp += p_iXp;
+
+	while (m_iXp >= m_iNextLvl)
+	{
+		m_iLvl++;
+		m_iXp -= m_iNextLvl;
+		m_iNextLvl *= 2; // I'm not even trying at this point
+		// TODO: Stat increases.
+	}
+}
+
+int Player::GetLvl()
+{
+	return m_iLvl;
+}
+
+int Player::GetXp()
+{
+	return m_iXp;
+}
+
+int Player::NextLvl()
+{
+	return m_iNextLvl;
 }
 
 bool Player::IsVisible()

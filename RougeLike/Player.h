@@ -8,12 +8,18 @@ public:
 	void Update();
 	Tile GetTile();
 	int Hurt(int p_iEnemySTR); // Calculates the damage, subtracts it from the HP and then returns it.
+	void Move(int p_iX, int p_iY);
+	void SetPos(int p_iX, int p_iY);
 	int GetHP();
 	int GetMaxHP();
 	int GetSTR();
 	int GetDEF();
 	int GetX();
 	int GetY();
+	void AddXp(int p_iXp);
+	int GetLvl();
+	int GetXp();
+	int NextLvl();
 	bool IsVisible();
 	EENTITYTYPE GetType();
 private:
@@ -24,4 +30,7 @@ private:
 	int m_iMaxHP;
 	int m_iSTR;
 	int m_iDEF;
+	int m_iXp;
+	int m_iNextLvl;
+	int m_iLvl;
 };
