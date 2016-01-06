@@ -1,7 +1,7 @@
 #pragma once
 
 struct Tile {
-	int tile;
+	int spriteId;
 	Uint32 fgColor;
 	Uint32 bgColor;
 	char* description;
