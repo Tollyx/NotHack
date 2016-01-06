@@ -5,6 +5,7 @@
 #include "SpriteManager.h"
 #include "Sprite.h"
 #include "DungeonGenerator.h"
+#include <chrono>
 
 GameState::GameState(System& p_xSystem)
 {
@@ -21,7 +22,7 @@ void GameState::Enter()
 	m_iScreenTileHeight = m_xSystem.m_iScreenHeight / 12;
 	m_iScreenTileWidth = m_xSystem.m_iScreenWidth / 12;
 
-	m_pxMap = DungeonGenerator::GenerateMap(m_iScreenTileWidth, m_iScreenTileHeight, 32, 32);
+	m_pxMap = DungeonGenerator::GenerateMap(m_iScreenTileWidth, m_iScreenTileHeight, 32, std::chrono::system_clock::now().time_since_epoch().count());
 
 	for (int i = 0; i < 16*16; i++)
 	{
