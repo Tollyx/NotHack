@@ -5,7 +5,7 @@ Player::Player(Tile p_Tile, int p_iX, int p_iY)
 {
 	m_Tile = p_Tile;
 	m_iX = p_iX;
-	m_iY = m_iY;
+	m_iY = p_iY;
 	m_iMaxHP = 10;
 	m_iHP = 10;
 	m_iSTR = 5;

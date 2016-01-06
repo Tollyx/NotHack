@@ -2,8 +2,9 @@
 
 struct Tile {
 	int spriteId;
-	Uint32 fgColor;
-	Uint32 bgColor;
+	int r;
+	int g;
+	int b;
 	char* description;
 };
 

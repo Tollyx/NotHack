@@ -81,7 +81,7 @@ void DrawManager::DrawSprite(Sprite * p_pxSprite, int p_iX, int p_iY, Uint8 p_iR
 {
 	SDL_SetTextureColorMod(p_pxSprite->GetTexture(), p_iR, p_iG, p_iB);
 	DrawSprite(p_pxSprite, p_iX, p_iY);
-	SDL_SetTextureColorMod(p_pxSprite->GetTexture(), 0, 0, 0);
+	SDL_SetTextureColorMod(p_pxSprite->GetTexture(), 255, 255, 255);
 }
 
 SDL_Renderer* DrawManager::GetRenderer()

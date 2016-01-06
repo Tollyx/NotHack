@@ -4,6 +4,8 @@
 
 class Map;
 class Sprite;
+class Player;
+class IEntity;
 
 class GameState : public IState
 {
@@ -19,7 +21,9 @@ private:
 	System m_xSystem;
 	Map* m_pxMap;
 	std::vector<Sprite*> m_apxSprites;
+	std::vector<IEntity*> m_apxEntities;
 	Sprite* test;
 	int m_iScreenTileWidth;
 	int m_iScreenTileHeight;
+	Player* m_pxPlayer;
 };

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "GameState.h"
 #include "Map.h"
+#include "Player.h"
 #include "DrawManager.h"
 #include "SpriteManager.h"
 #include "Sprite.h"
@@ -29,7 +30,24 @@ void GameState::Enter()
 
 	m_pxMap = DungeonGenerator::GenerateMap(m_iScreenTileWidth, m_iScreenTileHeight, 32, std::chrono::system_clock::now().time_since_epoch().count());
 
+	Tile playerTile;
+	playerTile.spriteId = '@';
+	playerTile.r = 255;
+	playerTile.g = 255;
+	playerTile.b = 255;
+	playerTile.description = "This is you.";
 
+	Tile goblinTile;
+	goblinTile.spriteId = 'g';
+	goblinTile.r = 0;
+	goblinTile.g = 224;
+	goblinTile.b = 0;
+	goblinTile.description = "A goblin.";
+
+	SDL_Point spawnPos = m_pxMap->GetEntrance();
+	m_pxPlayer = new Player(goblinTile, spawnPos.x, spawnPos.y);
+
+	m_apxEntities.push_back(m_pxPlayer);
 }
 
 bool GameState::Update(float p_fDeltaTime)
@@ -41,12 +59,21 @@ void GameState::Exit()
 {
 	delete m_pxMap;
 	m_pxMap = nullptr;
-
-	auto it = m_apxSprites.begin();
-	while (it != m_apxSprites.end())
 	{
-		m_xSystem.m_pxSpriteManager->DestroySprite(*it);
-		it++;
+		auto it = m_apxSprites.begin();
+		while (it != m_apxSprites.end())
+		{
+			m_xSystem.m_pxSpriteManager->DestroySprite(*it);
+			it++;
+		}
+	}
+	{
+		auto it = m_apxEntities.begin();
+		while (it != m_apxEntities.end())
+		{
+			delete (*it);
+			it++;
+		}
 	}
 }
 
@@ -60,6 +87,23 @@ void GameState::Draw()
 			m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at(m_pxMap->GetTile(x, y)), x * 12, y * 12);
 		}
 	}
+
+	auto it = m_apxEntities.begin();
+	while (it != m_apxEntities.end())
+	{
+		// First, let's draw the background.
+		m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at(219),
+			(*it)->GetX() * 12, (*it)->GetY() * 12,
+			0, 0, 0);
+
+		// Now, the foreground
+		Tile tile = (*it)->GetTile();
+		m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at(tile.spriteId), 
+			(*it)->GetX() * 12, (*it)->GetY() * 12,
+			tile.r, tile.g, tile.b);
+		it++;
+	}
+
 	/*
 	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('T'), 1 * 12, 1 * 12);
 	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('e'), 2 * 12, 1 * 12);
