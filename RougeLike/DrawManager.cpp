@@ -64,7 +64,7 @@ void DrawManager::Present()
 	SDL_RenderPresent(m_pxRenderer);
 }
 
-void DrawManager::Draw(Sprite* p_pxSprite, int p_iX, int p_iY)
+void DrawManager::DrawSprite(Sprite* p_pxSprite, int p_iX, int p_iY)
 {
 	// Creates a destination rect by combining the position parameters with the Sprite region data. This is later used to know where and how big will
 	// render thic picture.
@@ -75,6 +75,13 @@ void DrawManager::Draw(Sprite* p_pxSprite, int p_iX, int p_iY)
 	// of the Sprites SDL_Texture to the correct destination we created earlier.
 	SDL_RenderCopy(m_pxRenderer, p_pxSprite->GetTexture(),
 		p_pxSprite->GetRegion(), &rect);
+}
+
+void DrawManager::DrawSprite(Sprite * p_pxSprite, int p_iX, int p_iY, Uint8 p_iR, Uint8 p_iG, Uint8 p_iB)
+{
+	SDL_SetTextureColorMod(p_pxSprite->GetTexture(), p_iR, p_iG, p_iB);
+	DrawSprite(p_pxSprite, p_iX, p_iY);
+	SDL_SetTextureColorMod(p_pxSprite->GetTexture(), 0, 0, 0);
 }
 
 SDL_Renderer* DrawManager::GetRenderer()

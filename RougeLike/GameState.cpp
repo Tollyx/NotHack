@@ -55,17 +55,17 @@ void GameState::Draw()
 	{
 		for (int x = 0; x < m_iScreenTileWidth; x++)
 		{
-			m_xSystem.m_pxDrawManager->Draw(m_apxSprites.at(m_pxMap->GetTile(x, y)), x * 12, y * 12);
+			m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at(m_pxMap->GetTile(x, y)), x * 12, y * 12);
 		}
 	}
 	/*
-	m_xSystem.m_pxDrawManager->Draw(m_apxSprites.at('T'), 1 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->Draw(m_apxSprites.at('e'), 2 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->Draw(m_apxSprites.at('s'), 3 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->Draw(m_apxSprites.at('t'), 4 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->Draw(m_apxSprites.at('i'), 5 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->Draw(m_apxSprites.at('n'), 6 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->Draw(m_apxSprites.at('g'), 7 * 12, 1 * 12);
+	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('T'), 1 * 12, 1 * 12);
+	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('e'), 2 * 12, 1 * 12);
+	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('s'), 3 * 12, 1 * 12);
+	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('t'), 4 * 12, 1 * 12);
+	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('i'), 5 * 12, 1 * 12);
+	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('n'), 6 * 12, 1 * 12);
+	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('g'), 7 * 12, 1 * 12);
 	*/
 }
 
