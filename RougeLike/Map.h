@@ -1,5 +1,12 @@
 #pragma once
 
+struct Tile {
+	int tile;
+	Uint32 fgColor;
+	Uint32 bgColor;
+	char* description;
+};
+
 class Map
 {
 public:
