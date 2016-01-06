@@ -119,5 +119,13 @@ void Engine::HandleEvents()
 		{
 			m_pxMouse->SetPosition(xEvent.motion.x, xEvent.motion.y);
 		}
+		else if (xEvent.type == SDL_KEYDOWN)
+		{
+			
+		}
+		else if (xEvent.type == SDL_KEYUP)
+		{
+
+		}
 	}
 }
