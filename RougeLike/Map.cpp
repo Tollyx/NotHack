@@ -60,6 +60,26 @@ void Map::SetTile(SDL_Point pos, int p_iTile)
 	SetTile(pos.x, pos.y, p_iTile);
 }
 
+void Map::SetEntrance(SDL_Point pos)
+{
+	m_pEntrance = pos;
+}
+
+SDL_Point Map::GetEntrance()
+{
+	return m_pEntrance;
+}
+
+void Map::SetExit(SDL_Point pos)
+{
+	m_pExit = pos;
+}
+
+SDL_Point Map::GetExit()
+{
+	return m_pExit;
+}
+
 int Map::GetHeight()
 {
 	return m_iHeight;

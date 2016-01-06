@@ -194,6 +194,29 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 		}
 	}
 
+	int entranceRoom;
+	int exitRoom;
+	do
+	{
+		entranceRoom = rand() % rooms.size();
+		exitRoom = rand() % rooms.size();
+	} while (entranceRoom == exitRoom);
+	
+	SDL_Point entrancePos;
+	SDL_Point exitPos;
+
+	entrancePos.x = rooms.at(entranceRoom).x + rand() % rooms.at(entranceRoom).w;
+	entrancePos.y = rooms.at(entranceRoom).y + rand() % rooms.at(entranceRoom).h;
+
+	dungeon->SetEntrance(entrancePos);
+	dungeon->SetTile(entrancePos, '>');
+
+	exitPos.x = rooms.at(exitRoom).x + rand() % rooms.at(exitRoom).w;
+	exitPos.y = rooms.at(exitRoom).y + rand() % rooms.at(exitRoom).h;
+
+	dungeon->SetExit(exitPos);
+	dungeon->SetTile(exitPos, '<');
+
 	return dungeon;
 }
 
