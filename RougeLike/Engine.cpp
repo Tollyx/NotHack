@@ -36,7 +36,7 @@ bool Engine::Initialize()
 
 	// Creates a new DrawManager and calls Initialize with width / height parameters.
 	m_pxDrawManager = new DrawManager();
-	if (m_pxDrawManager->Initialize(640, 480) == false)
+	if (m_pxDrawManager->Initialize(60 * 12, 40 * 12) == false)
 	{
 		return false;
 	}
@@ -47,8 +47,8 @@ bool Engine::Initialize()
 	m_pxStateManager = new StateManager();
 
 	System system;
-	system.m_iScreenWidth = 640;
-	system.m_iScreenHeight = 480;
+	system.m_iScreenWidth = 60 * 12;
+	system.m_iScreenHeight = 40 * 12;
 	system.m_pxDrawManager = m_pxDrawManager;
 	system.m_pxSpriteManager = m_pxSpriteManager;
 	system.m_pxMouse = m_pxMouse;
