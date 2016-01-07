@@ -6,7 +6,9 @@
 #include "IState.h"
 #include "GameState.h"
 #include "Sprite.h"
+#include "Keyboard.h"
 #include "Mouse.h"
+#include "InputManager.h"
 #include <iostream>
 
 Engine::Engine()
@@ -41,6 +43,9 @@ bool Engine::Initialize()
 		return false;
 	}
 	m_pxMouse = new Mouse();
+	m_pxKeyboard = new Keyboard();
+
+	m_pxInputManager = new InputManager(m_pxMouse, m_pxKeyboard);
 
 	m_pxSpriteManager = new SpriteManager(m_pxDrawManager->GetRenderer());
 
@@ -51,7 +56,7 @@ bool Engine::Initialize()
 	system.m_iScreenHeight = 40 * 12;
 	system.m_pxDrawManager = m_pxDrawManager;
 	system.m_pxSpriteManager = m_pxSpriteManager;
-	system.m_pxMouse = m_pxMouse;
+	system.m_pxInputManager = m_pxInputManager;
 	m_pxStateManager->SetState(new GameState(system));
 
 	m_bRunning = true;
@@ -70,6 +75,9 @@ void Engine::Shutdown()
 	
 	delete m_pxMouse;
 	m_pxMouse = nullptr;
+
+	delete m_pxKeyboard;
+	m_pxKeyboard = nullptr;
 
 	// Shuts down the drawmanager before deleting the object and nulling the pointer.
 	m_pxDrawManager->Shutdown();
@@ -121,11 +129,11 @@ void Engine::HandleEvents()
 		}
 		else if (xEvent.type == SDL_KEYDOWN)
 		{
-			
+			m_pxKeyboard->SetKey(xEvent.key.type, true);
 		}
 		else if (xEvent.type == SDL_KEYUP)
 		{
-
+			m_pxKeyboard->SetKey(xEvent.key.type, false);
 		}
 	}
 }

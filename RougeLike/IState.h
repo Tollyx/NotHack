@@ -2,7 +2,7 @@
 
 class SpriteManager;
 class DrawManager;
-class Mouse;
+class InputManager;
 
 struct System
 {
@@ -10,7 +10,7 @@ struct System
 	int m_iScreenHeight;
 	SpriteManager* m_pxSpriteManager;
 	DrawManager* m_pxDrawManager;
-	Mouse* m_pxMouse;
+	InputManager* m_pxInputManager;
 };
 
 class IState
