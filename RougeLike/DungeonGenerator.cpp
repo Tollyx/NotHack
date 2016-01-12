@@ -13,6 +13,62 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 	std::srand(p_iSeed);
 	std::rand();
 
+	Tile wallTile;
+	wallTile.spriteId = '#';
+	wallTile.r = 200;
+	wallTile.g = 200;
+	wallTile.b = 200;
+	wallTile.description = "A brick wall. Pretty sturdy.";
+	wallTile.isSolid = true;
+	wallTile.blocksSight = true;
+
+	Tile floorTile;
+	floorTile.spriteId = '.';
+	floorTile.r = 200;
+	floorTile.g = 200;
+	floorTile.b = 200;
+	floorTile.description = "It's the floor. You know, the thing you walk on.";
+	floorTile.blocksSight = false;
+	floorTile.isSolid = false;
+
+	Tile entranceTile;
+	entranceTile.spriteId = '<';
+	entranceTile.r = 200;
+	entranceTile.g = 200;
+	entranceTile.b = 200;
+	entranceTile.description = "A stairway leading upwards.";
+	entranceTile.blocksSight = false;
+	entranceTile.isSolid = false;
+
+	Tile exitTile;
+	exitTile.spriteId = '>';
+	exitTile.r = 200;
+	exitTile.g = 200;
+	exitTile.b = 200;
+	exitTile.description = "A stairway leading downwards.";
+	exitTile.blocksSight = false;
+	exitTile.isSolid = false;
+
+	Tile doorTile;
+	doorTile.spriteId = '+';
+	doorTile.r = 112;
+	doorTile.g = 50;
+	doorTile.b = 0;
+	doorTile.description = "A door.";
+	doorTile.blocksSight = true;
+	doorTile.isSolid = false;
+
+	std::vector<Tile> tileSet;
+	tileSet.push_back(floorTile);		// 0
+	tileSet.push_back(wallTile);		// 1
+	tileSet.push_back(entranceTile);	// 2
+	tileSet.push_back(exitTile);		// 3
+	tileSet.push_back(doorTile);		// 4
+
+	dungeon->SetTileset(tileSet);
+
+	//FloodFill(0, 0, -1, 1, dungeon);
+
 	std::vector<SDL_Rect> rooms;
 
 	for (int i = 0; i < p_iDensity; i++)
@@ -55,7 +111,7 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 		{
 			for (int x = 0; x < (*it).w; x++)
 			{
-				dungeon->SetTile(x + (*it).x, y + (*it).y, emptyTile);
+				dungeon->SetTile(x + (*it).x, y + (*it).y, -1);
 			}
 		}
 		it++;
@@ -72,7 +128,7 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 			{
 				for (int dy = -1; dy <= 1 && enclosed; dy++)
 				{
-					if (dungeon->GetTile(x + dx, y + dy) == emptyTile)
+					if (!dungeon->GetTile(x + dx, y + dy).isSolid)
 					{
 						enclosed = false;
 					}
@@ -87,13 +143,11 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 		}
 	}
 	
-	SDL_Point fillStart;
-	fillStart.x = rooms.front().x;
-	fillStart.y = rooms.front().y;
-	FloodFill(fillStart, emptyTile, floorTile, dungeon);
+	FloodFill(rooms.front().x, rooms.front().y, -1, 0, dungeon);
 	
+	int loop = 0;
 	bool done = false;
-	while (!done)
+	while (!done && loop < 100)
 	{
 		done = true;
 		std::vector<SDL_Point> connectors;
@@ -101,9 +155,9 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 		{
 			for (int y = 1; y < p_iHeight - 1; y++)
 			{
-				if (dungeon->GetTile(x, y) == floorTile)
+				if (dungeon->GetTileId(x, y) == 0)
 				{
-					if (dungeon->GetTile(x - 2, y) == emptyTile && x > 1)
+					if (dungeon->GetTileId(x - 2, y) == -1 && x > 1)
 					{
 						SDL_Point newConnector;
 						newConnector.x = x - 1;
@@ -111,7 +165,7 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 						connectors.push_back(newConnector);
 					}
 
-					if (dungeon->GetTile(x + 2, y) == emptyTile && x < p_iWidth)
+					if (dungeon->GetTileId(x + 2, y) == -1 && x < p_iWidth)
 					{
 						SDL_Point newConnector;
 						newConnector.x = x + 1;
@@ -119,7 +173,7 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 						connectors.push_back(newConnector);
 					}
 
-					if (dungeon->GetTile(x, y - 2) == emptyTile && y > 1)
+					if (dungeon->GetTileId(x, y - 2) == -1 && y > 1)
 					{
 						SDL_Point newConnector;
 						newConnector.x = x;
@@ -127,7 +181,7 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 						connectors.push_back(newConnector);
 					}
 
-					if (dungeon->GetTile(x, y + 2) == emptyTile && y < p_iHeight)
+					if (dungeon->GetTileId(x, y + 2) == -1 && y < p_iHeight)
 					{
 						SDL_Point newConnector;
 						newConnector.x = x;
@@ -135,7 +189,7 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 						connectors.push_back(newConnector);
 					}
 				}
-				else if (dungeon->GetTile(x, y) == emptyTile)
+				else if (dungeon->GetTileId(x, y) == -1)
 				{
 					done = false;
 				}
@@ -144,54 +198,60 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 		if (connectors.size() != 0)
 		{
 			int rng = rand() % connectors.size();
-			dungeon->SetTile(connectors.at(rng), emptyTile);
-			FloodFill(connectors.at(rng), emptyTile, floorTile, dungeon);
+			SDL_Point connector = connectors.at(rng);
+			dungeon->SetTile(connector, 4);
+			FloodFill(connector.x, connector.y, -1, 0, dungeon);
 
 			if (rand() % 100 < 25)
 			{
 				connectors.erase(connectors.begin() + rng);
+
 				rng = rand() % connectors.size();
-				dungeon->SetTile(connectors.at(rng), emptyTile);
-				FloodFill(connectors.at(rng), emptyTile, floorTile, dungeon);
+				SDL_Point connector = connectors.at(rng);
+				dungeon->SetTile(connectors.at(rng), 4);
+				FloodFill(connector.x, connector.y, -1, 0, dungeon);
 			}
 		}
+		loop++;
 	}
+	loop = 0;
 	done = false;
-	while (!done)
+	while (!done && loop < 100)
 	{
 		done = true;
 		for (int x = 1; x < p_iWidth - 1; x++)
 		{
 			for (int y = 1; y < p_iHeight - 1; y++)
 			{
-				if (dungeon->GetTile(x, y) == floorTile)
+				if (dungeon->GetTile(x, y).isSolid == false)
 				{
 					int count = 0;
-					if (dungeon->GetTile(x - 1, y) == floorTile)
+					if (!dungeon->GetTile(x - 1, y).isSolid)
 					{
 						count++;
 					}
-					if (dungeon->GetTile(x + 1, y) == floorTile)
+					if (!dungeon->GetTile(x + 1, y).isSolid)
 					{
 						count++;
 					}
-					if (dungeon->GetTile(x, y - 1) == floorTile)
+					if (!dungeon->GetTile(x, y - 1).isSolid)
 					{
 						count++;
 					}
-					if (dungeon->GetTile(x, y + 1) == floorTile)
+					if (!dungeon->GetTile(x, y + 1).isSolid)
 					{
 						count++;
 					}
 
 					if (count < 2)
 					{
-						dungeon->SetTile(x, y, 178);
+						dungeon->SetTile(x, y, 1);
 						done = false;
 					}
 				}
 			}
 		}
+		loop++;
 	}
 
 	int entranceRoom;
@@ -205,17 +265,17 @@ Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, 
 	SDL_Point entrancePos;
 	SDL_Point exitPos;
 
-	entrancePos.x = rooms.at(entranceRoom).x + rand() % rooms.at(entranceRoom).w;
-	entrancePos.y = rooms.at(entranceRoom).y + rand() % rooms.at(entranceRoom).h;
+	entrancePos.x = rooms.at(entranceRoom).x + rand() % (rooms.at(entranceRoom).w - 1);
+	entrancePos.y = rooms.at(entranceRoom).y + rand() % (rooms.at(entranceRoom).h - 1);
 
 	dungeon->SetEntrance(entrancePos);
-	dungeon->SetTile(entrancePos, '>');
+	dungeon->SetTile(entrancePos, 2);
 
-	exitPos.x = rooms.at(exitRoom).x + rand() % rooms.at(exitRoom).w;
-	exitPos.y = rooms.at(exitRoom).y + rand() % rooms.at(exitRoom).h;
+	exitPos.x = rooms.at(exitRoom).x + rand() % (rooms.at(exitRoom).w - 1);
+	exitPos.y = rooms.at(exitRoom).y + rand() % (rooms.at(exitRoom).h - 1);
 
 	dungeon->SetExit(exitPos);
-	dungeon->SetTile(exitPos, '<');
+	dungeon->SetTile(exitPos, 3);
 
 	return dungeon;
 }
@@ -235,20 +295,19 @@ bool DungeonGenerator::AABB(SDL_Rect left, SDL_Rect right)
 // Fills an empty area with a maze. "Maze bucket-fill"
 void DungeonGenerator::MazeGen(int p_iX, int p_iY, Map* p_pxMap)
 {
-	p_pxMap->SetTile(p_iX, p_iY, emptyTile);
+	p_pxMap->SetTile(p_iX, p_iY, -1);
 
 	std::vector<int> dirs; // Available directions from this position, stored in "numpad-format". Look at your numpad and then the number and you'll get it.
-
-	if (p_pxMap->GetTile(p_iX - 1, p_iY) != emptyTile) // Left
+	if (p_pxMap->GetTile(p_iX - 1, p_iY).isSolid) // Left
 	{
 		bool enclosed = true;
 		for (int i = 0; i < 3 && enclosed; i++)
 		{
-			if (p_pxMap->GetTile(p_iX - 1, p_iY - 1 + i) == emptyTile)
+			if (!p_pxMap->GetTile(p_iX - 1, p_iY - 1 + i).isSolid)
 			{
 				enclosed = false;
 			}
-			if (p_pxMap->GetTile(p_iX - 2, p_iY - 1 + i) == emptyTile)
+			if (!p_pxMap->GetTile(p_iX - 2, p_iY - 1 + i).isSolid)
 			{
 				enclosed = false;
 			}
@@ -259,16 +318,16 @@ void DungeonGenerator::MazeGen(int p_iX, int p_iY, Map* p_pxMap)
 		}
 	}
 	
-	if (p_pxMap->GetTile(p_iX + 1, p_iY) != emptyTile) // Right
+	if (p_pxMap->GetTile(p_iX + 1, p_iY).isSolid) // Right
 	{
 		bool enclosed = true;
 		for (int i = 0; i < 3 && enclosed; i++)
 		{
-			if (p_pxMap->GetTile(p_iX + 1, p_iY - 1 + i) == emptyTile)
+			if (!p_pxMap->GetTile(p_iX + 1, p_iY - 1 + i).isSolid)
 			{
 				enclosed = false;
 			}
-			if (p_pxMap->GetTile(p_iX + 2, p_iY - 1 + i) == emptyTile)
+			if (!p_pxMap->GetTile(p_iX + 2, p_iY - 1 + i).isSolid)
 			{
 				enclosed = false;
 			}
@@ -279,16 +338,16 @@ void DungeonGenerator::MazeGen(int p_iX, int p_iY, Map* p_pxMap)
 		}
 	}
 
-	if (p_pxMap->GetTile(p_iX, p_iY - 1) != emptyTile) // Up
+	if (p_pxMap->GetTile(p_iX, p_iY - 1).isSolid) // Up
 	{
 		bool enclosed = true;
 		for (int i = -1; i <= 1 && enclosed; i++)
 		{
-			if (p_pxMap->GetTile(p_iX + i, p_iY - 1) == emptyTile)
+			if (!p_pxMap->GetTile(p_iX + i, p_iY - 1).isSolid)
 			{
 				enclosed = false;
 			}
-			if (p_pxMap->GetTile(p_iX + i, p_iY - 2) == emptyTile)
+			if (!p_pxMap->GetTile(p_iX + i, p_iY - 2).isSolid)
 			{
 				enclosed = false;
 			}
@@ -299,16 +358,16 @@ void DungeonGenerator::MazeGen(int p_iX, int p_iY, Map* p_pxMap)
 		}
 	}
 
-	if (p_pxMap->GetTile(p_iX, p_iY + 1) != emptyTile) // Down
+	if (p_pxMap->GetTile(p_iX, p_iY + 1).isSolid) // Down
 	{
 		bool enclosed = true;
 		for (int i = 0; i < 3 && enclosed; i++)
 		{
-			if (p_pxMap->GetTile(p_iX - 1 + i, p_iY + 1) == emptyTile)
+			if (!p_pxMap->GetTile(p_iX - 1 + i, p_iY + 1).isSolid)
 			{
 				enclosed = false;
 			}
-			if (p_pxMap->GetTile(p_iX - 1 + i, p_iY + 2) == emptyTile)
+			if (!p_pxMap->GetTile(p_iX - 1 + i, p_iY + 2).isSolid)
 			{
 				enclosed = false;
 			}
@@ -346,43 +405,34 @@ void DungeonGenerator::MazeGen(int p_iX, int p_iY, Map* p_pxMap)
 	}
 }
 
-void DungeonGenerator::FloodFill(SDL_Point p_pxNode, int p_iTargetTile, int p_iReplacementTile, Map * p_pxMap)
-{
-	if (p_pxMap->GetTile(p_pxNode.x, p_pxNode.y) != p_iTargetTile || p_pxMap->GetTile(p_pxNode.x, p_pxNode.y) == '+')
+void DungeonGenerator::FloodFill(int p_iX, int p_iY, int p_iTargetTile, int p_iReplacementTile, Map * p_pxMap)
+{	
+	if (p_iX < 0 ||
+		p_iY < 0 ||
+		p_iX >= p_pxMap->GetWidth() ||
+		p_iY >= p_pxMap->GetHeight())
 	{
 		return;
 	}
-	if (p_pxMap->GetTile(p_pxNode.x, p_pxNode.y) != '+')
+	if (p_pxMap->GetTileId(p_iX, p_iY) == p_iTargetTile)
 	{
-		p_pxMap->SetTile(p_pxNode.x, p_pxNode.y, p_iReplacementTile);
+		p_pxMap->SetTile(p_iX, p_iY, p_iReplacementTile);
 	}
-	if (p_pxMap->GetTile(p_pxNode.x - 1, p_pxNode.y) == p_iTargetTile)
+	if (p_pxMap->GetTileId(p_iX - 1, p_iY) == p_iTargetTile)
 	{
-		SDL_Point newNode;
-		newNode.x = p_pxNode.x - 1;
-		newNode.y = p_pxNode.y;
-		FloodFill(newNode, p_iTargetTile, p_iReplacementTile, p_pxMap);
+		FloodFill(p_iX - 1, p_iY, p_iTargetTile, p_iReplacementTile, p_pxMap);
 	}
-	if (p_pxMap->GetTile(p_pxNode.x + 1, p_pxNode.y) == p_iTargetTile)
+	if (p_pxMap->GetTileId(p_iX + 1, p_iY) == p_iTargetTile)
 	{
-		SDL_Point newNode;
-		newNode.x = p_pxNode.x + 1;
-		newNode.y = p_pxNode.y;
-		FloodFill(newNode, p_iTargetTile, p_iReplacementTile, p_pxMap);
+		FloodFill(p_iX + 1, p_iY, p_iTargetTile, p_iReplacementTile, p_pxMap);
 	}
-	if (p_pxMap->GetTile(p_pxNode.x, p_pxNode.y - 1) == p_iTargetTile)
+	if (p_pxMap->GetTileId(p_iX, p_iY - 1) == p_iTargetTile)
 	{
-		SDL_Point newNode;
-		newNode.x = p_pxNode.x;
-		newNode.y = p_pxNode.y - 1;
-		FloodFill(newNode, p_iTargetTile, p_iReplacementTile, p_pxMap);
+		FloodFill(p_iX, p_iY - 1, p_iTargetTile, p_iReplacementTile, p_pxMap);
 	}
-	if (p_pxMap->GetTile(p_pxNode.x, p_pxNode.y + 1) == p_iTargetTile)
+	if (p_pxMap->GetTileId(p_iX, p_iY + 1) == p_iTargetTile)
 	{
-		SDL_Point newNode;
-		newNode.x = p_pxNode.x;
-		newNode.y = p_pxNode.y + 1;
-		FloodFill(newNode, p_iTargetTile, p_iReplacementTile, p_pxMap);
+		FloodFill(p_iX, p_iY + 1, p_iTargetTile, p_iReplacementTile, p_pxMap);
 	}
-
+	
 }

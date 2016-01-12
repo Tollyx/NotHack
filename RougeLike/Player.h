@@ -4,7 +4,7 @@
 
 class Player : public IEntity {
 public:
-	Player(Tile p_Tile, int p_iX, int p_iY);
+	Player(int p_iX, int p_iY);
 	void Update();
 	Tile GetTile();
 	int Hurt(int p_iEnemySTR); // Calculates the damage, subtracts it from the HP and then returns it.

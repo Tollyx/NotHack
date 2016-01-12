@@ -13,7 +13,7 @@ Map::Map(int p_iWidth, int p_iHeight)
 		m_aiTileMap[x] = new int[m_iHeight];
 		for (int y = 0; y < m_iHeight; y++)
 		{
-			m_aiTileMap[x][y] = 178;
+			m_aiTileMap[x][y] = 1;
 		}
 	}
 }
@@ -27,12 +27,48 @@ Map::~Map()
 	delete m_aiTileMap;
 }
 
-int Map::GetTile(SDL_Point pos)
+void Map::SetTileset(std::vector<Tile> p_axTileset)
+{
+	m_axTileset = p_axTileset;
+}
+
+Tile Map::GetTile(SDL_Point pos)
 {
 	return GetTile(pos.x, pos.y);
 }
 
-int Map::GetTile(int p_iX, int p_iY)
+Tile Map::GetTile(int p_iX, int p_iY)
+{
+	if (p_iX >= 0 && p_iX < m_iWidth)
+	{
+		if (p_iY >= 0 && p_iY < m_iHeight)
+		{
+			int tileId = m_aiTileMap[p_iX][p_iY];
+			if (m_axTileset.size() > tileId && tileId >= 0)
+			{
+				return m_axTileset.at(tileId);
+			}
+		}
+	}
+
+	Tile blank;
+	blank.r = 0;
+	blank.g = 0;
+	blank.b = 0;
+	blank.isSolid = false;
+	blank.blocksSight = false;
+	blank.description = "Nothing.";
+	blank.spriteId = ' ';
+
+	return blank;
+}
+
+int Map::GetTileId(SDL_Point pos)
+{
+	return GetTileId(pos.x, pos.y);
+}
+
+int Map::GetTileId(int p_iX, int p_iY)
 {
 	if (p_iX >= 0 && p_iX < m_iWidth)
 	{
@@ -41,7 +77,7 @@ int Map::GetTile(int p_iX, int p_iY)
 			return m_aiTileMap[p_iX][p_iY];
 		}
 	}
-	return 0;
+	return -1;
 }
 
 void Map::SetTile(int p_iX, int p_iY, int p_iTile)

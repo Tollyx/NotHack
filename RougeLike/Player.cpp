@@ -1,9 +1,16 @@
 #include "stdafx.h"
 #include "Player.h"
 
-Player::Player(Tile p_Tile, int p_iX, int p_iY)
+Player::Player(int p_iX, int p_iY)
 {
-	m_Tile = p_Tile;
+	m_Tile.spriteId = '@';
+	m_Tile.r = 000;
+	m_Tile.g = 127;
+	m_Tile.b = 255;
+	m_Tile.description = "This is you. A human. Probably.";
+	m_Tile.isSolid = true;
+	m_Tile.blocksSight = false;
+
 	m_iX = p_iX;
 	m_iY = p_iY;
 	m_iMaxHP = 10;

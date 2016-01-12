@@ -29,24 +29,7 @@ void GameState::Enter()
 	}
 
 	m_pxMap = DungeonGenerator::GenerateMap(m_iScreenTileWidth, m_iScreenTileHeight, 32, std::chrono::system_clock::now().time_since_epoch().count());
-
-	Tile playerTile;
-	playerTile.spriteId = '@';
-	playerTile.r = 255;
-	playerTile.g = 255;
-	playerTile.b = 255;
-	playerTile.description = "This is you.";
-
-	Tile goblinTile;
-	goblinTile.spriteId = 'g';
-	goblinTile.r = 0;
-	goblinTile.g = 224;
-	goblinTile.b = 0;
-	goblinTile.description = "A goblin.";
-
-	SDL_Point spawnPos = m_pxMap->GetEntrance();
-	m_pxPlayer = new Player(goblinTile, spawnPos.x, spawnPos.y);
-
+	m_pxPlayer = new Player(0, 0);
 	m_apxEntities.push_back(m_pxPlayer);
 }
 
@@ -80,27 +63,37 @@ void GameState::Exit()
 void GameState::Draw()
 {
 	m_xSystem.m_pxDrawManager->Clear();
-	for (int y = 0; y < m_iScreenTileHeight; y++)
+	for (int y = 0; y < m_xCamera.h; y++)
 	{
-		for (int x = 0; x < m_iScreenTileWidth; x++)
+		for (int x = 0; x < m_xCamera.w; x++)
 		{
-			m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at(m_pxMap->GetTile(x, y)), x * 12, y * 12);
+			Tile t = m_pxMap->GetTile(x + m_xCamera.x, y + m_xCamera.y);
+			m_xSystem.m_pxDrawManager->DrawSprite(
+				m_apxSprites.at(t.spriteId), 
+				(x + 12) * 12, 
+				(y + 0) * 12,
+				t.r, t.g, t.b);
 		}
 	}
 
 	auto it = m_apxEntities.begin();
 	while (it != m_apxEntities.end())
 	{
-		// First, let's draw the background.
-		m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at(219),
-			(*it)->GetX() * 12, (*it)->GetY() * 12,
+		// Background
+		m_xSystem.m_pxDrawManager->DrawSprite(
+			m_apxSprites.at(219), // A square that covers the entire tile
+			((*it)->GetX() + 12 - m_xCamera.x) * 12, 
+			((*it)->GetY() + 0 - m_xCamera.y) * 12,
 			0, 0, 0);
 
-		// Now, the foreground
+		// Foreground
 		Tile tile = (*it)->GetTile();
-		m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at(tile.spriteId), 
-			(*it)->GetX() * 12, (*it)->GetY() * 12,
+		m_xSystem.m_pxDrawManager->DrawSprite(
+			m_apxSprites.at(tile.spriteId), 
+			((*it)->GetX() + 12 - m_xCamera.x) * 12,
+			((*it)->GetY() + 0 - m_xCamera.y) * 12,
 			tile.r, tile.g, tile.b);
+
 		it++;
 	}
 
