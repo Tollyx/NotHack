@@ -4,7 +4,8 @@
 
 enum EENTITYTYPE
 {
-	ENTITY_PLAYER
+	ENTITY_PLAYER,
+	ENTITY_MONSTER
 };
 
 class Sprite;

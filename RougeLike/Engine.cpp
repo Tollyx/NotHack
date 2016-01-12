@@ -102,7 +102,7 @@ void Engine::Update()
 		m_pxStateManager->Draw();
 		
 		m_pxDrawManager->Present();
-		SDL_Delay(10);
+		SDL_Delay(1000 / 30);
 	}
 }
 
@@ -129,11 +129,13 @@ void Engine::HandleEvents()
 		}
 		else if (xEvent.type == SDL_KEYDOWN)
 		{
-			m_pxKeyboard->SetKey(xEvent.key.type, true);
+			printf("Keydown: %i\n", xEvent.key.keysym.sym);
+			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, true);
 		}
 		else if (xEvent.type == SDL_KEYUP)
 		{
-			m_pxKeyboard->SetKey(xEvent.key.type, false);
+			printf("Keyup: %i\n", xEvent.key.keysym.sym);
+			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, false);
 		}
 	}
 }

@@ -45,6 +45,53 @@ void GameState::Enter()
 
 bool GameState::Update(float p_fDeltaTime)
 {
+	int dx = 0, dy = 0;
+	if (m_xSystem.m_pxInputManager->IsKeyDown('w'))
+	{
+		dy--;
+	}
+	if (m_xSystem.m_pxInputManager->IsKeyDown('a'))
+	{
+		dx--;
+	}
+	if (m_xSystem.m_pxInputManager->IsKeyDown('s'))
+	{
+		dy++;
+	}
+	if (m_xSystem.m_pxInputManager->IsKeyDown('d'))
+	{
+		dx++;
+	}
+	
+	if (dx + dy != 0) {
+		if (m_pxMap->GetTile(m_pxPlayer->GetX() + dx, m_pxPlayer->GetY() + dy).isSolid == false)
+		{
+			m_pxPlayer->Move(dx, dy);
+
+			m_xCamera.x = m_pxPlayer->GetX() - m_xCamera.w / 2;
+			m_xCamera.y = m_pxPlayer->GetY() - m_xCamera.h / 2;
+
+			SDL_Delay(100);
+		}
+
+		SDL_Point exitPos = m_pxMap->GetExit();
+		if ( exitPos.x == m_pxPlayer->GetX() && exitPos.y == m_pxPlayer->GetY())
+		{
+			m_iLevelDepth++;
+			NewMap();
+		}
+		else
+		{
+			auto it = m_apxEntities.begin();
+			while (it != m_apxEntities.end())
+			{
+				(*it)->Update();
+				it++;
+			}
+		}
+		m_iTurns++;
+	}
+
 	return true;
 }
 
