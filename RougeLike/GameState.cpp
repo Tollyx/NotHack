@@ -6,6 +6,7 @@
 #include "SpriteManager.h"
 #include "Sprite.h"
 #include "DungeonGenerator.h"
+#include "InputManager.h"
 #include <chrono>
 
 GameState::GameState(System& p_xSystem)
@@ -16,6 +17,7 @@ GameState::GameState(System& p_xSystem)
 
 GameState::~GameState()
 {
+	
 }
 
 void GameState::Enter()
@@ -23,14 +25,22 @@ void GameState::Enter()
 	m_iScreenTileHeight = m_xSystem.m_iScreenHeight / 12;
 	m_iScreenTileWidth = m_xSystem.m_iScreenWidth / 12;
 
+	m_xCamera.x = 0;
+	m_xCamera.y = 0;
+	m_xCamera.w = m_iScreenTileWidth - 12;
+	m_xCamera.h = m_iScreenTileHeight - 2;
+
+	m_iLevelDepth = 0;
+	m_iTurns = 0;
+
 	for (int i = 0; i < 16*16; i++)
 	{
 		m_apxSprites.push_back(m_xSystem.m_pxSpriteManager->CreateSprite("../assets/ascii.bmp", (i % 16) * 12, (i / 16) * 12 , 12, 12));
 	}
 
-	m_pxMap = DungeonGenerator::GenerateMap(m_iScreenTileWidth, m_iScreenTileHeight, 32, std::chrono::system_clock::now().time_since_epoch().count());
 	m_pxPlayer = new Player(0, 0);
 	m_apxEntities.push_back(m_pxPlayer);
+	NewMap();
 }
 
 bool GameState::Update(float p_fDeltaTime)
@@ -111,4 +121,21 @@ void GameState::Draw()
 IState * GameState::NextState()
 {
 	return nullptr;
+}
+
+void GameState::NewMap()
+{
+	if (m_pxMap != nullptr)
+	{
+		delete m_pxMap;
+	}
+	m_pxMap = DungeonGenerator::GenerateMap(
+		m_xCamera.w / 2 + m_iLevelDepth * 2, 
+		m_xCamera.h / 2 + m_iLevelDepth * 2, 
+		16 + m_iLevelDepth * 2, 
+		std::chrono::system_clock::now().time_since_epoch().count());
+	SDL_Point entrancePos = m_pxMap->GetEntrance();
+	m_pxPlayer->SetPos(entrancePos.x, entrancePos.y);
+	m_xCamera.x = m_pxPlayer->GetX() - m_xCamera.w / 2;
+	m_xCamera.y = m_pxPlayer->GetY() - m_xCamera.h / 2;
 }
