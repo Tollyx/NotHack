@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "DrawManager.h"
 #include "SpriteManager.h"
+#include "AudioManager.h"
 #include "StateManager.h"
 #include "IState.h"
 #include "GameState.h"
@@ -42,6 +43,13 @@ bool Engine::Initialize()
 	{
 		return false;
 	}
+
+	m_pxAudioManager = new AudioManager();
+	if (m_pxAudioManager->Initialize() == false)
+	{
+		return false;
+	}
+
 	m_pxMouse = new Mouse();
 	m_pxKeyboard = new Keyboard();
 
@@ -56,6 +64,7 @@ bool Engine::Initialize()
 	system.m_iScreenHeight = 40 * 12;
 	system.m_pxDrawManager = m_pxDrawManager;
 	system.m_pxSpriteManager = m_pxSpriteManager;
+	system.m_pxAudioManager = m_pxAudioManager;
 	system.m_pxInputManager = m_pxInputManager;
 	m_pxStateManager->SetState(new GameState(system));
 
@@ -78,6 +87,10 @@ void Engine::Shutdown()
 
 	delete m_pxKeyboard;
 	m_pxKeyboard = nullptr;
+
+	m_pxAudioManager->Shutdown();
+	delete m_pxAudioManager;
+	m_pxAudioManager = nullptr;
 
 	// Shuts down the drawmanager before deleting the object and nulling the pointer.
 	m_pxDrawManager->Shutdown();

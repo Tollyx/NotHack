@@ -5,7 +5,7 @@ struct Tile {
 	int r;
 	int g;
 	int b;
-	char* description;
+	std::string description;
 	bool isSolid;
 	bool blocksSight;
 };

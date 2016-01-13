@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "DrawManager.h"
 #include "SpriteManager.h"
+#include "AudioManager.h"
 #include "Sprite.h"
 #include "DungeonGenerator.h"
 #include "InputManager.h"
@@ -35,12 +36,21 @@ void GameState::Enter()
 
 	for (int i = 0; i < 16*16; i++)
 	{
-		m_apxSprites.push_back(m_xSystem.m_pxSpriteManager->CreateSprite("../assets/ascii.bmp", (i % 16) * 12, (i / 16) * 12 , 12, 12));
+		m_apxSprites.push_back(
+			m_xSystem.m_pxSpriteManager->CreateSprite(
+				"../assets/ascii.bmp", 
+				(i % 16) * 12, 
+				(i / 16) * 12, 
+				12, 12
+			)
+		);
 	}
 
 	m_pxPlayer = new Player(0, 0);
 	m_apxEntities.push_back(m_pxPlayer);
 	NewMap();
+
+	m_pxTestSound = m_xSystem.m_pxAudioManager->LoadSound("../assets/test.ogg");
 }
 
 bool GameState::Update(float p_fDeltaTime)
@@ -64,14 +74,13 @@ bool GameState::Update(float p_fDeltaTime)
 	}
 	
 	if (dx + dy != 0) {
+		m_xSystem.m_pxAudioManager->PlaySound(m_pxTestSound, 1.0f);
 		if (m_pxMap->GetTile(m_pxPlayer->GetX() + dx, m_pxPlayer->GetY() + dy).isSolid == false)
 		{
 			m_pxPlayer->Move(dx, dy);
 
 			m_xCamera.x = m_pxPlayer->GetX() - m_xCamera.w / 2;
 			m_xCamera.y = m_pxPlayer->GetY() - m_xCamera.h / 2;
-
-			SDL_Delay(100);
 		}
 
 		SDL_Point exitPos = m_pxMap->GetExit();
@@ -89,6 +98,7 @@ bool GameState::Update(float p_fDeltaTime)
 				it++;
 			}
 		}
+		SDL_Delay(100);
 		m_iTurns++;
 	}
 

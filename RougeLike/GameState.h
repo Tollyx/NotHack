@@ -7,6 +7,7 @@ class Sprite;
 class Player;
 class IEntity;
 class SDL_Rect;
+class Mix_Chunk;
 
 class GameState : public IState
 {
@@ -30,4 +31,5 @@ private:
 	int m_iTurns;
 	Player* m_pxPlayer;
 	SDL_Rect m_xCamera;
+	Mix_Chunk* m_pxTestSound;
 };
