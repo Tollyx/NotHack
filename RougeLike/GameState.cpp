@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GameState.h"
+#include "MainmenuState.h"
 #include "Map.h"
 #include "Player.h"
 #include "DrawManager.h"
@@ -72,8 +73,13 @@ bool GameState::Update(float p_fDeltaTime)
 	{
 		dx++;
 	}
+
+	if (m_xSystem.m_pxInputManager->IsKeyDown(27)) // Escape
+	{
+		return false;
+	}
 	
-	if (dx + dy != 0) {
+	if (dx != 0 || dy != 0) {
 		m_xSystem.m_pxAudioManager->PlaySound(m_pxTestSound, 1.0f);
 		if (m_pxMap->GetTile(m_pxPlayer->GetX() + dx, m_pxPlayer->GetY() + dy).isSolid == false)
 		{
@@ -98,8 +104,13 @@ bool GameState::Update(float p_fDeltaTime)
 				it++;
 			}
 		}
-		SDL_Delay(100);
+		//SDL_Delay(100);
 		m_iTurns++;
+	}
+
+	if (m_pxPlayer->GetHP() <= 0)
+	{
+		return false;
 	}
 
 	return true;
@@ -177,7 +188,7 @@ void GameState::Draw()
 
 IState * GameState::NextState()
 {
-	return nullptr;
+	return new MainmenuState(m_xSystem); // Todo: goto gameover state
 }
 
 void GameState::NewMap()

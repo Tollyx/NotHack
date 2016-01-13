@@ -5,6 +5,7 @@
 #include "AudioManager.h"
 #include "StateManager.h"
 #include "IState.h"
+#include "MainmenuState.h"
 #include "GameState.h"
 #include "Sprite.h"
 #include "Keyboard.h"
@@ -66,7 +67,7 @@ bool Engine::Initialize()
 	system.m_pxSpriteManager = m_pxSpriteManager;
 	system.m_pxAudioManager = m_pxAudioManager;
 	system.m_pxInputManager = m_pxInputManager;
-	m_pxStateManager->SetState(new GameState(system));
+	m_pxStateManager->SetState(new MainmenuState(system));
 
 	m_bRunning = true;
 
