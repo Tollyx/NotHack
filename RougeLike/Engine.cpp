@@ -103,25 +103,27 @@ void Engine::Shutdown()
 
 void Engine::Update()
 {
-
 	// Our engines core loop
 	while (m_bRunning)
 	{
-		HandleEvents();
-		if (!m_pxStateManager->Update()) 
+		if (HandleEvents()) // Only updates if needed, in other words, if a keypress happened.
 		{
-			m_bRunning = false;
+			if (!m_pxStateManager->Update())
+			{
+				m_bRunning = false;
+			}
 		}
 		m_pxDrawManager->Clear();
 		m_pxStateManager->Draw();
-		
+
 		m_pxDrawManager->Present();
-		SDL_Delay(1000 / 30);
+		SDL_Delay(1000 / 60);
 	}
 }
 
-void Engine::HandleEvents()
+bool Engine::HandleEvents()
 {
+	bool needsUpdate = false;
 	SDL_Event xEvent;
 	while (SDL_PollEvent(&xEvent))
 	{
@@ -132,6 +134,7 @@ void Engine::HandleEvents()
 		else if (xEvent.type == SDL_MOUSEBUTTONDOWN)
 		{
 			m_pxMouse->SetButton(xEvent.button.button, true);
+			//needsUpdate = true;
 		}
 		else if (xEvent.type == SDL_MOUSEBUTTONUP)
 		{
@@ -145,11 +148,14 @@ void Engine::HandleEvents()
 		{
 			printf("Keydown: %i\n", xEvent.key.keysym.sym);
 			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, true);
+			needsUpdate = true;
 		}
 		else if (xEvent.type == SDL_KEYUP)
 		{
 			printf("Keyup: %i\n", xEvent.key.keysym.sym);
 			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, false);
+			//needsUpdate = true;
 		}
 	}
+	return needsUpdate;
 }

@@ -28,7 +28,7 @@ public:
 	* The Engines update loop
 	*/
 	void Update();
-	void HandleEvents();
+	bool HandleEvents(); // returns true if the state needs to update
 
 private:
 	bool m_bRunning;
