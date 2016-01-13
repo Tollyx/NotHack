@@ -3,6 +3,7 @@
 class SpriteManager;
 class DrawManager;
 class InputManager;
+class AudioManager;
 
 struct System
 {
@@ -10,6 +11,7 @@ struct System
 	int m_iScreenHeight;
 	SpriteManager* m_pxSpriteManager;
 	DrawManager* m_pxDrawManager;
+	AudioManager* m_pxAudioManager;
 	InputManager* m_pxInputManager;
 };
 
