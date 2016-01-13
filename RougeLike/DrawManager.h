@@ -8,7 +8,6 @@ public:
 	DrawManager();
 	~DrawManager();
 
-
 	/**
 	* Initializes the DrawManager and creates an SDL_Renderer connected to an SDL_Window with the specified Width and Height defined in params.
 	*/
