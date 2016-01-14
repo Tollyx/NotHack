@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "Goblin.h"
 #include "TileManager.h"
+#include "Goblin.h"
 
 
 Goblin::Goblin(int p_iX, int p_iY, int p_iLvl)
