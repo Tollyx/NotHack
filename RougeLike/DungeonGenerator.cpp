@@ -77,8 +77,8 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 		SDL_Rect newRoom;
 		newRoom.h = 3 + (rand() % 8);
 		newRoom.w = 3 + (rand() % 8);
-		newRoom.x = 1 + (rand() % (p_iWidth - newRoom.w));
-		newRoom.y = 1 + (rand() % (p_iHeight - newRoom.h));
+		newRoom.x = 1 + (rand() % ((p_iWidth - 1) - newRoom.w));
+		newRoom.y = 1 + (rand() % ((p_iHeight - 1) - newRoom.h));
 
 		if (i == 0)
 		{
@@ -203,14 +203,58 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 			dungeon->SetTile(connector, 4);
 			FloodFill(connector.x, connector.y, -1, 0, dungeon);
 
-			if (rand() % 100 < 25)
+			auto it = connectors.begin();
+			while (it != connectors.end())
 			{
-				connectors.erase(connectors.begin() + rng);
+				int count = 0;
+				if (dungeon->GetTileId((*it).x - 1, (*it).y) == 0)
+				{
+					count++;
+				}
+				else if (dungeon->GetTileId((*it).x - 1, (*it).y) == 4)
+				{
+					it++;
+					continue;
+				}
 
-				rng = rand() % connectors.size();
-				SDL_Point connector = connectors.at(rng);
-				dungeon->SetTile(connectors.at(rng), 4);
-				FloodFill(connector.x, connector.y, -1, 0, dungeon);
+				if (dungeon->GetTileId((*it).x + 1, (*it).y) == 0)
+				{
+					count++;
+				}
+				else if (dungeon->GetTileId((*it).x + 1, (*it).y) == 4)
+				{
+					it++;
+					continue;
+				}
+
+				if (dungeon->GetTileId((*it).x, (*it).y - 1) == 0)
+				{
+					count++;
+				}
+				else if (dungeon->GetTileId((*it).x, (*it).y - 1) == 4)
+				{
+					it++;
+					continue;
+				}
+
+				if (dungeon->GetTileId((*it).x, (*it).y + 1) == 0)
+				{
+					count++;
+				}
+				else if (dungeon->GetTileId((*it).x, (*it).y + 1) == 4)
+				{
+					it++;
+					continue;
+				}
+
+				if (count == 2)
+				{
+					if (rand() % 100 < 4)
+					{
+						dungeon->SetTile((*it).x, (*it).y, 4);
+					}
+				}
+				it++;
 			}
 		}
 		loop++;
