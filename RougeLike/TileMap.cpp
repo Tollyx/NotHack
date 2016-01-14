@@ -17,6 +17,24 @@ TileMap::TileMap(int p_iWidth, int p_iHeight)
 			m_aiTileMap[x][y] = 1;
 		}
 	}
+	m_aiTileMapVisible = new bool*[m_iWidth];
+	for (int x = 0; x < m_iWidth; x++)
+	{
+		m_aiTileMapVisible[x] = new bool[m_iHeight];
+		for (int y = 0; y < m_iHeight; y++)
+		{
+			m_aiTileMapVisible[x][y] = false;
+		}
+	}
+	m_aiTileMapSeen = new bool*[m_iWidth];
+	for (int x = 0; x < m_iWidth; x++)
+	{
+		m_aiTileMapSeen[x] = new bool[m_iHeight];
+		for (int y = 0; y < m_iHeight; y++)
+		{
+			m_aiTileMapSeen[x][y] = false;
+		}
+	}
 }
 
 TileMap::~TileMap()
@@ -95,6 +113,63 @@ void TileMap::SetTile(int p_iX, int p_iY, int p_iTile)
 void TileMap::SetTile(SDL_Point pos, int p_iTile)
 {
 	SetTile(pos.x, pos.y, p_iTile);
+}
+
+void TileMap::SetVisible(int p_iX, int p_iY, bool p_bVisible)
+{
+	if (p_iX >= 0 && p_iX < m_iWidth - 1)
+	{
+		if (p_iY >= 0 && p_iY < m_iHeight - 1)
+		{
+			m_aiTileMapVisible[p_iX][p_iY] = p_bVisible;
+		}
+	}
+}
+
+void TileMap::SetSeen(int p_iX, int p_iY, bool p_bSeen)
+{
+	if (p_iX >= 0 && p_iX < m_iWidth - 1)
+	{
+		if (p_iY >= 0 && p_iY < m_iHeight - 1)
+		{
+			m_aiTileMapSeen[p_iX][p_iY] = p_bSeen;
+		}
+	}
+}
+
+bool TileMap::IsVisible(int p_iX, int p_iY)
+{
+	if (p_iX >= 0 && p_iX < m_iWidth - 1)
+	{
+		if (p_iY >= 0 && p_iY < m_iHeight - 1)
+		{
+			return m_aiTileMapVisible[p_iX][p_iY];
+		}
+	}
+	return false;
+}
+
+bool TileMap::IsSeen(int p_iX, int p_iY)
+{
+	if (p_iX >= 0 && p_iX < m_iWidth - 1)
+	{
+		if (p_iY >= 0 && p_iY < m_iHeight - 1)
+		{
+			return m_aiTileMapSeen[p_iX][p_iY];
+		}
+	}
+	return false;
+}
+
+void TileMap::clearVisible()
+{
+	for (int x = 0; x < m_iWidth; x++)
+	{
+		for (int y = 0; y < m_iHeight; y++)
+		{
+			m_aiTileMapVisible[x][y] = false;
+		}
+	}
 }
 
 void TileMap::SetEntrance(SDL_Point pos)
