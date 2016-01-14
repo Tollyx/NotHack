@@ -38,7 +38,8 @@ void MainmenuState::Enter()
 bool MainmenuState::Update(float p_fDeltaTime)
 {
 
-	if (m_xSystem.m_pxInputManager->IsKeyDown('w'))
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_UP) ||
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_8))
 	{
 		m_iSelection--;
 		if (m_iSelection < 0)
@@ -46,7 +47,8 @@ bool MainmenuState::Update(float p_fDeltaTime)
 			m_iSelection = 0;
 		}
 	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown('s'))
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_DOWN) ||
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_2))
 	{
 		m_iSelection++;
 		if (m_iSelection > 2)
@@ -54,7 +56,8 @@ bool MainmenuState::Update(float p_fDeltaTime)
 			m_iSelection = 2;
 		}
 	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown(13)) // Enter
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_RETURN) ||
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_ENTER))
 	{
 		if (m_iSelection != 1)
 		{

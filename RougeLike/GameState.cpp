@@ -50,37 +50,48 @@ void GameState::Enter()
 	m_pxPlayer = new Player(0, 0);
 	m_apxEntities.push_back(m_pxPlayer);
 	NewMap();
-
-	m_pxTestSound = m_xSystem.m_pxAudioManager->LoadSound("../assets/test.ogg");
 }
 
 bool GameState::Update(float p_fDeltaTime)
 {
+	bool update = false;
 	int dx = 0, dy = 0;
-	if (m_xSystem.m_pxInputManager->IsKeyDown('w'))
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_UP) || 
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_8))
 	{
 		dy--;
+		update = true;
 	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown('a'))
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LEFT) ||
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_4))
 	{
 		dx--;
+		update = true;
 	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown('s'))
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_DOWN) ||
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_2))
 	{
 		dy++;
+		update = true;
 	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown('d'))
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_RIGHT) ||
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_6))
 	{
 		dx++;
+		update = true;
+	}
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_PERIOD) ||
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_5))
+	{
+		update = true;
 	}
 
-	if (m_xSystem.m_pxInputManager->IsKeyDown(27)) // Escape
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_ESCAPE))
 	{
 		return false;
 	}
 	
-	if (dx != 0 || dy != 0) {
-		m_xSystem.m_pxAudioManager->PlaySound(m_pxTestSound, 1.0f);
+	if (update) {
 		if (m_pxMap->GetTile(m_pxPlayer->GetX() + dx, m_pxPlayer->GetY() + dy).isSolid == false)
 		{
 			m_pxPlayer->Move(dx, dy);

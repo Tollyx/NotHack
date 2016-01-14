@@ -3,10 +3,7 @@
 
 Keyboard::Keyboard()
 {
-	for (int i = 0; i < 256; i++)
-	{
-		m_abKeys[i] = false;
-	}
+
 }
 
 Keyboard::~Keyboard()
@@ -14,23 +11,45 @@ Keyboard::~Keyboard()
 
 }
 
-bool Keyboard::IsKeyDown(int p_iIndex)
+bool Keyboard::IsKeyDown(int p_iKeycode)
 {
-	if (p_iIndex < 0)
-		return false;
-	if (p_iIndex > 255)
-		return false;
-
-	return m_abKeys[p_iIndex];
+	auto it = m_aiPressedKeys.begin();
+	while (it != m_aiPressedKeys.end())
+	{
+		if (p_iKeycode == (*it))
+		{
+			return true;
+		}
+		it++;
+	}
 }
 
-void Keyboard::SetKey(int p_iIndex,
-	bool p_bValue)
+void Keyboard::SetKey(int p_iKeycode, bool p_bValue)
 {
-	if (p_iIndex < 0)
-		return;
-	if (p_iIndex > 255)
-		return;
-
-	m_abKeys[p_iIndex] = p_bValue;
+	if (p_bValue)
+	{
+		auto it = m_aiPressedKeys.begin();
+		while (it != m_aiPressedKeys.end())
+		{
+			if (p_iKeycode == (*it))
+			{
+				return;
+			}
+			it++;
+		}
+		m_aiPressedKeys.push_back(p_iKeycode);
+	}
+	else 
+	{
+		auto it = m_aiPressedKeys.begin();
+		while (it != m_aiPressedKeys.end())
+		{
+			if (p_iKeycode == (*it))
+			{
+				m_aiPressedKeys.erase(it);
+				return;
+			}
+			it++;
+		}
+	}
 }

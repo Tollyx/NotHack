@@ -31,5 +31,4 @@ private:
 	int m_iTurns;
 	Player* m_pxPlayer;
 	SDL_Rect m_xCamera;
-	Mix_Chunk* m_pxTestSound;
 };

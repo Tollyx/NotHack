@@ -146,13 +146,13 @@ bool Engine::HandleEvents()
 		}
 		else if (xEvent.type == SDL_KEYDOWN)
 		{
-			printf("Keydown: %i\n", xEvent.key.keysym.sym);
+			//printf("Keydown: %i\n", xEvent.key.keysym.sym);
 			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, true);
 			needsUpdate = true;
 		}
 		else if (xEvent.type == SDL_KEYUP)
 		{
-			printf("Keyup: %i\n", xEvent.key.keysym.sym);
+			//printf("Keyup: %i\n", xEvent.key.keysym.sym);
 			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, false);
 			//needsUpdate = true;
 		}

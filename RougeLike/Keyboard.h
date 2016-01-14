@@ -9,5 +9,5 @@ public:
 	void SetKey(int p_iIndex, 
 		bool p_bValue);
 private:
-	bool m_abKeys[256];
+	std::vector<int> m_aiPressedKeys;
 };
