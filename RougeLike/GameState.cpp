@@ -70,6 +70,13 @@ bool GameState::Update(float p_fDeltaTime)
 		update = true;
 	}
 
+	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LCTRL) &&
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_l))
+	{
+		NewMap();
+		update = true;
+	}
+
 	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_ESCAPE))
 	{
 		return false;
