@@ -86,7 +86,7 @@ int Player::GetY()
 	return m_iY;
 }
 
-void Player::AddXp(int p_iXp)
+void Player::AddXp(int p_iXp) // TODO: Better Lvlup thing
 {
 	m_iXp += p_iXp;
 
@@ -95,7 +95,10 @@ void Player::AddXp(int p_iXp)
 		m_iLvl++;
 		m_iXp -= m_iNextLvl;
 		m_iNextLvl *= 2; // I'm not even trying at this point
-		// TODO: Stat increases.
+		m_iSTR += m_iLvl % 2;
+		m_iDEF += m_iLvl % 2;
+		m_iMaxHP += 1;
+		m_iHP += 1;
 	}
 }
 
@@ -109,11 +112,6 @@ int Player::GetXp()
 	return m_iXp;
 }
 
-int Player::GetXpToNextLvl()
-{
-	return m_iNextLvl;
-}
-
 int Player::NextLvl()
 {
 	return m_iNextLvl;
@@ -124,7 +122,7 @@ bool Player::IsVisible()
 	return true;
 }
 
-EENTITYTYPE Player::GetType()
+ECREATURETYPE Player::GetCreatureType()
 {
-	return EENTITYTYPE::ENTITY_PLAYER;
+	return ECREATURETYPE::ENTITY_CREATURE_PLAYER;
 }

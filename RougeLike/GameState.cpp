@@ -156,7 +156,7 @@ void GameState::Draw()
 		25, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
 
 	// Experience to next level
-	m_xSystem.m_pxTileManager->DrawText("NXT:" + std::to_string(m_pxPlayer->GetXpToNextLvl()),
+	m_xSystem.m_pxTileManager->DrawText("NXT:" + std::to_string(m_pxPlayer->NextLvl()),
 		32, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
 }
 
