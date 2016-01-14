@@ -37,8 +37,15 @@ void AudioManager::Shutdown()
 
 void AudioManager::PlaySound(Mix_Chunk * p_pxSound, float p_fVolume)
 {
-	Mix_VolumeChunk(p_pxSound, 128 * m_fMasterVolume * p_fVolume);
-	Mix_PlayChannel(-1, p_pxSound, 0);
+	if (p_pxSound != nullptr)
+	{
+		Mix_VolumeChunk(p_pxSound, 128 * m_fMasterVolume * p_fVolume);
+		Mix_PlayChannel(-1, p_pxSound, 0);
+	}
+	else
+	{
+		printf("Tried to play sound with nullptr!");
+	}
 }
 
 Mix_Chunk* AudioManager::LoadSound(const std::string & p_sFilepath)
@@ -72,6 +79,7 @@ void AudioManager::DestroySound(Mix_Chunk * p_pxSound)
 		{
 			Mix_FreeChunk(it->second);
 			m_apxSounds.erase(it);
+			break;
 		}
 		it++;
 	}
