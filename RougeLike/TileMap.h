@@ -1,20 +1,11 @@
 #pragma once
+struct Tile;
 
-struct Tile {
-	int spriteId;
-	int r;
-	int g;
-	int b;
-	std::string description;
-	bool isSolid;
-	bool blocksSight;
-};
-
-class Map
+class TileMap
 {
 public:
-	Map(int p_iWidth, int p_iHeight);
-	~Map();
+	TileMap(int p_iWidth, int p_iHeight);
+	~TileMap();
 	void SetTileset(std::vector<Tile> p_axTileset);
 	Tile GetTile(SDL_Point pos);
 	Tile GetTile(int p_iX, int p_iY);
@@ -29,7 +20,7 @@ public:
 	int GetHeight();
 	int GetWidth();
 private:
-	Map() {};
+	TileMap() {};
 	int m_iWidth;
 	int m_iHeight;
 	int** m_aiTileMap;

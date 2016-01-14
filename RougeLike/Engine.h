@@ -2,6 +2,7 @@
 
 class DrawManager;
 class SpriteManager;
+class TileManager;
 class StateManager;
 class Mouse;
 class Keyboard;
@@ -34,6 +35,7 @@ private:
 	bool m_bRunning;
 	DrawManager* m_pxDrawManager;
 	SpriteManager* m_pxSpriteManager;
+	TileManager* m_pxTileManager;
 	AudioManager* m_pxAudioManager;
 	StateManager* m_pxStateManager;
 	Mouse* m_pxMouse;

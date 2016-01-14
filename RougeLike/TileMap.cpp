@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include <time.h>
-#include "Map.h"
+#include "TileMap.h"
+#include "TileManager.h"
 
-Map::Map(int p_iWidth, int p_iHeight)
+TileMap::TileMap(int p_iWidth, int p_iHeight)
 {
 	m_iWidth = p_iWidth;
 	m_iHeight = p_iHeight;
@@ -18,7 +19,7 @@ Map::Map(int p_iWidth, int p_iHeight)
 	}
 }
 
-Map::~Map()
+TileMap::~TileMap()
 {
 	for (int x = 0; x < m_iWidth; x++)
 	{
@@ -27,17 +28,17 @@ Map::~Map()
 	delete m_aiTileMap;
 }
 
-void Map::SetTileset(std::vector<Tile> p_axTileset)
+void TileMap::SetTileset(std::vector<Tile> p_axTileset)
 {
 	m_axTileset = p_axTileset;
 }
 
-Tile Map::GetTile(SDL_Point pos)
+Tile TileMap::GetTile(SDL_Point pos)
 {
 	return GetTile(pos.x, pos.y);
 }
 
-Tile Map::GetTile(int p_iX, int p_iY)
+Tile TileMap::GetTile(int p_iX, int p_iY)
 {
 	if (p_iX >= 0 && p_iX < m_iWidth)
 	{
@@ -63,12 +64,12 @@ Tile Map::GetTile(int p_iX, int p_iY)
 	return blank;
 }
 
-int Map::GetTileId(SDL_Point pos)
+int TileMap::GetTileId(SDL_Point pos)
 {
 	return GetTileId(pos.x, pos.y);
 }
 
-int Map::GetTileId(int p_iX, int p_iY)
+int TileMap::GetTileId(int p_iX, int p_iY)
 {
 	if (p_iX >= 0 && p_iX < m_iWidth)
 	{
@@ -80,7 +81,7 @@ int Map::GetTileId(int p_iX, int p_iY)
 	return -1;
 }
 
-void Map::SetTile(int p_iX, int p_iY, int p_iTile)
+void TileMap::SetTile(int p_iX, int p_iY, int p_iTile)
 {
 	if (p_iX >= 0 && p_iX < m_iWidth - 1)
 	{
@@ -91,37 +92,37 @@ void Map::SetTile(int p_iX, int p_iY, int p_iTile)
 	}
 }
 
-void Map::SetTile(SDL_Point pos, int p_iTile)
+void TileMap::SetTile(SDL_Point pos, int p_iTile)
 {
 	SetTile(pos.x, pos.y, p_iTile);
 }
 
-void Map::SetEntrance(SDL_Point pos)
+void TileMap::SetEntrance(SDL_Point pos)
 {
 	m_pEntrance = pos;
 }
 
-SDL_Point Map::GetEntrance()
+SDL_Point TileMap::GetEntrance()
 {
 	return m_pEntrance;
 }
 
-void Map::SetExit(SDL_Point pos)
+void TileMap::SetExit(SDL_Point pos)
 {
 	m_pExit = pos;
 }
 
-SDL_Point Map::GetExit()
+SDL_Point TileMap::GetExit()
 {
 	return m_pExit;
 }
 
-int Map::GetHeight()
+int TileMap::GetHeight()
 {
 	return m_iHeight;
 }
 
-int Map::GetWidth()
+int TileMap::GetWidth()
 {
 	return m_iWidth;
 }

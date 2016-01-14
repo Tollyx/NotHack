@@ -2,7 +2,7 @@
 
 #include "IState.h"
 
-class Map;
+class TileMap;
 class Sprite;
 class Player;
 class IEntity;
@@ -22,11 +22,9 @@ public:
 private:
 	void NewMap();
 	System m_xSystem;
-	Map* m_pxMap;
+	TileMap* m_pxMap;
 	std::vector<Sprite*> m_apxSprites;
 	std::vector<IEntity*> m_apxEntities;
-	int m_iScreenTileWidth;
-	int m_iScreenTileHeight;
 	int m_iLevelDepth;
 	int m_iTurns;
 	Player* m_pxPlayer;

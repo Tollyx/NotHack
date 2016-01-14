@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Map.h"
+struct Tile;
 
 enum EENTITYTYPE
 {

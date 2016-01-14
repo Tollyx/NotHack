@@ -1,5 +1,7 @@
 #include "stdafx.h"
+#include "TileManager.h"
 #include "Player.h"
+
 
 Player::Player(int p_iX, int p_iY)
 {
@@ -105,6 +107,11 @@ int Player::GetLvl()
 int Player::GetXp()
 {
 	return m_iXp;
+}
+
+int Player::GetXpToNextLvl()
+{
+	return m_iNextLvl;
 }
 
 int Player::NextLvl()

@@ -1,15 +1,16 @@
 #include "stdafx.h"
 #include "DungeonGenerator.h"
-#include "Map.h"
+#include "TileManager.h"
+#include "TileMap.h"
 
 DungeonGenerator::DungeonGenerator()
 {
 }
 
-Map* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, int p_iSeed)
+TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, int p_iSeed)
 {
 	std::printf("Creating dungeon with width %i, height %i and density %i \n", p_iWidth, p_iHeight, p_iDensity);
-	Map* dungeon = new Map(p_iWidth, p_iHeight);
+	TileMap* dungeon = new TileMap(p_iWidth, p_iHeight);
 	std::srand(p_iSeed);
 	std::rand();
 
@@ -293,7 +294,7 @@ bool DungeonGenerator::AABB(SDL_Rect left, SDL_Rect right)
 }
 
 // Fills an empty area with a maze. "Maze bucket-fill"
-void DungeonGenerator::MazeGen(int p_iX, int p_iY, Map* p_pxMap)
+void DungeonGenerator::MazeGen(int p_iX, int p_iY, TileMap* p_pxMap)
 {
 	p_pxMap->SetTile(p_iX, p_iY, -1);
 
@@ -405,7 +406,7 @@ void DungeonGenerator::MazeGen(int p_iX, int p_iY, Map* p_pxMap)
 	}
 }
 
-void DungeonGenerator::FloodFill(int p_iX, int p_iY, int p_iTargetTile, int p_iReplacementTile, Map * p_pxMap)
+void DungeonGenerator::FloodFill(int p_iX, int p_iY, int p_iTargetTile, int p_iReplacementTile, TileMap * p_pxMap)
 {	
 	if (p_iX < 0 ||
 		p_iY < 0 ||

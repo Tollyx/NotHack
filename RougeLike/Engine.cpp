@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "DrawManager.h"
 #include "SpriteManager.h"
+#include "TileManager.h"
 #include "AudioManager.h"
 #include "StateManager.h"
 #include "IState.h"
@@ -58,13 +59,15 @@ bool Engine::Initialize()
 
 	m_pxSpriteManager = new SpriteManager(m_pxDrawManager->GetRenderer());
 
+	m_pxTileManager = new TileManager(m_pxDrawManager, m_pxSpriteManager);
+	m_pxTileManager->SetTileSet("../assets/12x12.bmp", 12, 12);
+	//m_pxTileManager->SetTileSet("../assets/16x16.bmp", 16, 16);
+	//m_pxTileManager->SetTileSet("../assets/24x24.bmp", 24, 24);
+
 	m_pxStateManager = new StateManager();
 
 	System system;
-	system.m_iScreenWidth = 60 * 12;
-	system.m_iScreenHeight = 40 * 12;
-	system.m_pxDrawManager = m_pxDrawManager;
-	system.m_pxSpriteManager = m_pxSpriteManager;
+	system.m_pxTileManager = m_pxTileManager;
 	system.m_pxAudioManager = m_pxAudioManager;
 	system.m_pxInputManager = m_pxInputManager;
 	m_pxStateManager->SetState(new MainmenuState(system));

@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "GameState.h"
 #include "MainmenuState.h"
-#include "Map.h"
+#include "TileManager.h"
+#include "TileMap.h"
 #include "Player.h"
-#include "DrawManager.h"
-#include "SpriteManager.h"
 #include "AudioManager.h"
 #include "Sprite.h"
 #include "DungeonGenerator.h"
@@ -24,28 +23,13 @@ GameState::~GameState()
 
 void GameState::Enter()
 {
-	m_iScreenTileHeight = m_xSystem.m_iScreenHeight / 12;
-	m_iScreenTileWidth = m_xSystem.m_iScreenWidth / 12;
-
 	m_xCamera.x = 0;
 	m_xCamera.y = 0;
-	m_xCamera.w = m_iScreenTileWidth - 12;
-	m_xCamera.h = m_iScreenTileHeight - 2;
+	m_xCamera.w = m_xSystem.m_pxTileManager->GetWindowTileWidth();
+	m_xCamera.h = m_xSystem.m_pxTileManager->GetWindowTileHeight() - 2;
 
 	m_iLevelDepth = 0;
 	m_iTurns = 0;
-
-	for (int i = 0; i < 16*16; i++)
-	{
-		m_apxSprites.push_back(
-			m_xSystem.m_pxSpriteManager->CreateSprite(
-				"../assets/ascii.bmp", 
-				(i % 16) * 12, 
-				(i / 16) * 12, 
-				12, 12
-			)
-		);
-	}
 
 	m_pxPlayer = new Player(0, 0);
 	m_apxEntities.push_back(m_pxPlayer);
@@ -115,7 +99,6 @@ bool GameState::Update(float p_fDeltaTime)
 				it++;
 			}
 		}
-		//SDL_Delay(100);
 		m_iTurns++;
 	}
 
@@ -132,14 +115,6 @@ void GameState::Exit()
 	delete m_pxMap;
 	m_pxMap = nullptr;
 	{
-		auto it = m_apxSprites.begin();
-		while (it != m_apxSprites.end())
-		{
-			m_xSystem.m_pxSpriteManager->DestroySprite(*it);
-			it++;
-		}
-	}
-	{
 		auto it = m_apxEntities.begin();
 		while (it != m_apxEntities.end())
 		{
@@ -151,55 +126,43 @@ void GameState::Exit()
 
 void GameState::Draw()
 {
-	m_xSystem.m_pxDrawManager->Clear();
-	for (int y = 0; y < m_xCamera.h; y++)
-	{
-		for (int x = 0; x < m_xCamera.w; x++)
-		{
-			Tile t = m_pxMap->GetTile(x + m_xCamera.x, y + m_xCamera.y);
-			m_xSystem.m_pxDrawManager->DrawSprite(
-				m_apxSprites.at(t.spriteId), 
-				(x + 12) * 12, 
-				(y + 0) * 12,
-				t.r, t.g, t.b);
-		}
-	}
+	m_xSystem.m_pxTileManager->DrawTileMap(m_pxMap, 0, 1, 
+		m_xCamera.x, m_xCamera.y, 
+		m_xCamera.w, m_xCamera.h);
 
 	auto it = m_apxEntities.begin();
 	while (it != m_apxEntities.end())
 	{
-		// Background
-		m_xSystem.m_pxDrawManager->DrawSprite(
-			m_apxSprites.at(219), // A square that covers the entire tile
-			((*it)->GetX() + 12 - m_xCamera.x) * 12, 
-			((*it)->GetY() + 0 - m_xCamera.y) * 12,
-			0, 0, 0);
-
-		// Foreground
-		Tile tile = (*it)->GetTile();
-		m_xSystem.m_pxDrawManager->DrawSprite(
-			m_apxSprites.at(tile.spriteId), 
-			((*it)->GetX() + 12 - m_xCamera.x) * 12,
-			((*it)->GetY() + 0 - m_xCamera.y) * 12,
-			tile.r, tile.g, tile.b);
+		m_xSystem.m_pxTileManager->DrawTile((*it)->GetTile(), (*it)->GetX() - m_xCamera.x, (*it)->GetY() - m_xCamera.y + 1);
 
 		it++;
 	}
 
-	/*
-	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('T'), 1 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('e'), 2 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('s'), 3 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('t'), 4 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('i'), 5 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('n'), 6 * 12, 1 * 12);
-	m_xSystem.m_pxDrawManager->DrawSprite(m_apxSprites.at('g'), 7 * 12, 1 * 12);
-	*/
+	// Health and max health
+	m_xSystem.m_pxTileManager->DrawText(
+		"HP:" + std::to_string(m_pxPlayer->GetHP()) + "/" + std::to_string(m_pxPlayer->GetMaxHP()),
+		2, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
+
+	// Level
+	m_xSystem.m_pxTileManager->DrawText("LVL:" + std::to_string(m_pxPlayer->GetLvl()),
+		11, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
+
+	// Strength
+	m_xSystem.m_pxTileManager->DrawText("STR:" + std::to_string(m_pxPlayer->GetSTR()),
+		18, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
+
+	// Defence
+	m_xSystem.m_pxTileManager->DrawText("DEF:" + std::to_string(m_pxPlayer->GetDEF()),
+		25, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
+
+	// Experience to next level
+	m_xSystem.m_pxTileManager->DrawText("NXT:" + std::to_string(m_pxPlayer->GetXpToNextLvl()),
+		32, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
 }
 
 IState * GameState::NextState()
 {
-	return new MainmenuState(m_xSystem); // Todo: goto gameover state
+	return new MainmenuState(m_xSystem); // TODO: gameover state
 }
 
 void GameState::NewMap()

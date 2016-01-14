@@ -19,6 +19,7 @@ public:
 	void AddXp(int p_iXp);
 	int GetLvl();
 	int GetXp();
+	int GetXpToNextLvl();
 	int NextLvl();
 	bool IsVisible();
 	EENTITYTYPE GetType();
