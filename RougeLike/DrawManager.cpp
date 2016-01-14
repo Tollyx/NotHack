@@ -64,6 +64,11 @@ void DrawManager::Present()
 	SDL_RenderPresent(m_pxRenderer);
 }
 
+void DrawManager::SetWindowSize(int p_iWidth, int p_iHeight)
+{
+	SDL_SetWindowSize(m_pxWindow, p_iWidth, p_iHeight);
+}
+
 void DrawManager::DrawSprite(Sprite* p_pxSprite, int p_iX, int p_iY)
 {
 	// Creates a destination rect by combining the position parameters with the Sprite region data. This is later used to know where and how big will

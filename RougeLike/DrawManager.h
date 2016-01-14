@@ -15,6 +15,7 @@ public:
 	void Shutdown();
 	void Clear();
 	void Present();
+	void SetWindowSize(int p_iWidth, int p_iHeight);
 	void DrawSprite(Sprite* p_pxSprite, int p_iX, int p_iY);
 	void DrawSprite(Sprite* p_pxSprite, int p_iX, int p_iY, Uint8 p_iR, Uint8 p_iG, Uint8 p_iB);
 
