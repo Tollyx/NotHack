@@ -93,6 +93,7 @@ bool GameState::Update(float p_fDeltaTime)
 	}
 
 	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_RETURN) ||
+		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_ENTER) ||
 		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LESS))
 	{
 		SDL_Point exitPos = m_pxMap->GetExit();
@@ -120,6 +121,7 @@ bool GameState::Update(float p_fDeltaTime)
 				if (entity == nullptr || !entity->IsVisible())
 				{
 					m_pxPlayer->Move(dx, dy);
+					m_pxMap->ClearVisible();
 
 					m_xCamera.x = m_pxPlayer->GetX() - m_xCamera.w / 2;
 					m_xCamera.y = m_pxPlayer->GetY() - m_xCamera.h / 2;
@@ -145,7 +147,7 @@ bool GameState::Update(float p_fDeltaTime)
 			}
 		}
 		m_pxMap->Update();
-		
+		m_pxMap->DoFOV(m_pxPlayer->GetX(), m_pxPlayer->GetY(), 16);
 		m_iTurns++;
 	}
 
@@ -272,6 +274,7 @@ void GameState::NewMap()
 	SDL_Point entrancePos = m_pxMap->GetEntrance();
 	m_pxPlayer->SetPos(entrancePos.x, entrancePos.y);
 	m_pxMap->AddEntity(m_pxPlayer);
+	m_pxMap->DoFOV(m_pxPlayer->GetX(), m_pxPlayer->GetY(), 16);
 	m_xCamera.x = m_pxPlayer->GetX() - m_xCamera.w / 2;
 	m_xCamera.y = m_pxPlayer->GetY() - m_xCamera.h / 2;
 }

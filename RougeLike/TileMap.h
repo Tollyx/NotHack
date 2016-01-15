@@ -17,19 +17,18 @@ public:
 
 	// Tile stuff
 	void SetTileset(std::vector<Tile> p_axTileset); // Should probably rename this, can get mixed up with TileManager's setTileset.
-	Tile GetTile(SDL_Point pos);
 	Tile GetTile(int p_iX, int p_iY);
-	int GetTileId(SDL_Point pos);
 	int GetTileId(int p_iX, int p_iY);
 	void SetTile(int p_iX, int p_iY, int p_iTile);
 	void SetTile(SDL_Point pos, int p_iTile);
 
 	// FOV Stuff
+	void DoFOV(int p_iX, int p_iY, float p_iRadius);
 	void SetVisible(int p_iX, int p_iY, bool p_bVisible);
 	void SetSeen(int p_iX, int p_iY, bool p_bSeen);
 	bool IsVisible(int p_iX, int p_iY);
 	bool IsSeen(int p_iX, int p_iY);
-	void clearVisible();
+	void ClearVisible();
 
 	void SetEntrance(SDL_Point pos);
 	SDL_Point GetEntrance();
@@ -40,6 +39,7 @@ public:
 	int GetWidth();
 private:
 	TileMap() {};
+	void CastLight(int row, float start, float end, int xx, int xy, int yx, int yy, int startX, int startY, float radius);
 	int m_iWidth;
 	int m_iHeight;
 	int** m_aiTileMap;

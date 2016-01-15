@@ -112,11 +112,6 @@ void TileMap::SetTileset(std::vector<Tile> p_axTileset)
 	m_axTileset = p_axTileset;
 }
 
-Tile TileMap::GetTile(SDL_Point pos)
-{
-	return GetTile(pos.x, pos.y);
-}
-
 Tile TileMap::GetTile(int p_iX, int p_iY)
 {
 	if (p_iX >= 0 && p_iX < m_iWidth)
@@ -141,11 +136,6 @@ Tile TileMap::GetTile(int p_iX, int p_iY)
 	blank.spriteId = ' ';
 
 	return blank;
-}
-
-int TileMap::GetTileId(SDL_Point pos)
-{
-	return GetTileId(pos.x, pos.y);
 }
 
 int TileMap::GetTileId(int p_iX, int p_iY)
@@ -176,22 +166,39 @@ void TileMap::SetTile(SDL_Point pos, int p_iTile)
 	SetTile(pos.x, pos.y, p_iTile);
 }
 
+void TileMap::DoFOV(int p_iX, int p_iY, float p_iRadius)
+{
+	SetVisible(p_iX, p_iY, true);
+	CastLight(1, 1.0f, 0.0f, 0, -1, -1, 0, p_iX, p_iY, p_iRadius);
+	CastLight(1, 1.0f, 0.0f, -1, 0, 0, -1, p_iX, p_iY, p_iRadius);
+	CastLight(1, 1.0f, 0.0f, 0, 1, -1, 0, p_iX, p_iY, p_iRadius);
+	CastLight(1, 1.0f, 0.0f, 1, 0, 0, -1, p_iX, p_iY, p_iRadius);
+	CastLight(1, 1.0f, 0.0f, 0, -1, 1, 0, p_iX, p_iY, p_iRadius);
+	CastLight(1, 1.0f, 0.0f, -1, 0, 0, 1, p_iX, p_iY, p_iRadius);
+	CastLight(1, 1.0f, 0.0f, 0, 1, 1, 0, p_iX, p_iY, p_iRadius);
+	CastLight(1, 1.0f, 0.0f, 1, 0, 0, 1, p_iX, p_iY, p_iRadius);
+}
+
 void TileMap::SetVisible(int p_iX, int p_iY, bool p_bVisible)
 {
-	if (p_iX >= 0 && p_iX < m_iWidth - 1)
+	if (p_iX >= 0 && p_iX < m_iWidth)
 	{
-		if (p_iY >= 0 && p_iY < m_iHeight - 1)
+		if (p_iY >= 0 && p_iY < m_iHeight)
 		{
 			m_aiTileMapVisible[p_iX][p_iY] = p_bVisible;
+			if (p_bVisible)
+			{
+				m_aiTileMapSeen[p_iX][p_iY] = p_bVisible;
+			}
 		}
 	}
 }
 
 void TileMap::SetSeen(int p_iX, int p_iY, bool p_bSeen)
 {
-	if (p_iX >= 0 && p_iX < m_iWidth - 1)
+	if (p_iX >= 0 && p_iX < m_iWidth)
 	{
-		if (p_iY >= 0 && p_iY < m_iHeight - 1)
+		if (p_iY >= 0 && p_iY < m_iHeight)
 		{
 			m_aiTileMapSeen[p_iX][p_iY] = p_bSeen;
 		}
@@ -200,9 +207,9 @@ void TileMap::SetSeen(int p_iX, int p_iY, bool p_bSeen)
 
 bool TileMap::IsVisible(int p_iX, int p_iY)
 {
-	if (p_iX >= 0 && p_iX < m_iWidth - 1)
+	if (p_iX >= 0 && p_iX < m_iWidth)
 	{
-		if (p_iY >= 0 && p_iY < m_iHeight - 1)
+		if (p_iY >= 0 && p_iY < m_iHeight)
 		{
 			return m_aiTileMapVisible[p_iX][p_iY];
 		}
@@ -212,9 +219,9 @@ bool TileMap::IsVisible(int p_iX, int p_iY)
 
 bool TileMap::IsSeen(int p_iX, int p_iY)
 {
-	if (p_iX >= 0 && p_iX < m_iWidth - 1)
+	if (p_iX >= 0 && p_iX < m_iWidth)
 	{
-		if (p_iY >= 0 && p_iY < m_iHeight - 1)
+		if (p_iY >= 0 && p_iY < m_iHeight)
 		{
 			return m_aiTileMapSeen[p_iX][p_iY];
 		}
@@ -222,7 +229,7 @@ bool TileMap::IsSeen(int p_iX, int p_iY)
 	return false;
 }
 
-void TileMap::clearVisible()
+void TileMap::ClearVisible()
 {
 	for (int x = 0; x < m_iWidth; x++)
 	{
@@ -261,4 +268,65 @@ int TileMap::GetHeight()
 int TileMap::GetWidth()
 {
 	return m_iWidth;
+}
+
+// Recursive shadowcasting
+// Ported from http://www.roguebasin.com/index.php?title=Improved_Shadowcasting_in_Java
+// I think I understand how it works.
+void TileMap::CastLight(int row, float start, float end, int xx, int xy, int yx, int yy, int startX, int startY, float radius)
+{
+	float newStart = 0.0f;
+	if (start < end)
+	{
+		return;
+	}
+	bool blocked = false;
+	for (int distance = row; distance <= radius && !blocked; distance++)
+	{
+		int deltaY = -distance;
+		for (int deltaX = -distance; deltaX <= 0; deltaX++)
+		{
+			int currentX = startX + deltaX * xx + deltaY * xy;
+			int currentY = startY + deltaX * yx + deltaY * yy;
+			float leftSlope = (deltaX - 0.5f) / (deltaY + 0.0f);
+			float rightSlope = (deltaX + 0.5f) / (deltaY - 0.0f);
+
+			if (!(currentX >= 0 && currentY >= 0 && currentX < GetWidth() && currentY < GetHeight()) || start < rightSlope)
+			{
+				continue;
+			}
+			else if (end > leftSlope)
+			{
+				break;
+			}
+
+			if (sqrt(deltaX*deltaX + deltaY*deltaY) <= radius)
+			{
+				SetVisible(currentX, currentY, true);
+			}
+
+			if (blocked)
+			{
+				if (GetTile(currentX, currentY).blocksSight)
+				{
+					newStart = rightSlope;
+					continue;
+				}
+				else 
+				{
+					blocked = false;
+					start = newStart;
+				}
+			}
+			else
+			{
+				if (GetTile(currentX, currentY).blocksSight && distance < radius)
+				{
+					blocked = true;
+					CastLight(distance + 1, start, leftSlope, xx, xy, yx, yy, startX, startY, radius);
+					newStart = rightSlope;
+				}
+			}
+		}
+	}
 }

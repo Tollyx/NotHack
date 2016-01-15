@@ -78,8 +78,22 @@ void TileManager::DrawTileMap(TileMap* p_pxTileMap, int p_iX, int p_iY, int p_iX
 	{
 		for (int x = 0; x < p_iWidth; x++)
 		{
-			DrawTile(p_pxTileMap->GetTile(x + p_iXOffset, y + p_iYOffset),
-				x + p_iX, y + p_iY);
+			if (p_pxTileMap->IsSeen(x + p_iXOffset, y + p_iYOffset))
+			{
+				if (p_pxTileMap->IsVisible(x + p_iXOffset, y + p_iYOffset))
+				{
+					DrawTile(p_pxTileMap->GetTile(x + p_iXOffset, y + p_iYOffset),
+						x + p_iX, y + p_iY);
+				}
+				else
+				{
+					Tile temp = p_pxTileMap->GetTile(x + p_iXOffset, y + p_iYOffset);
+					temp.r -= 150;
+					temp.g -= 150;
+					temp.b -= 100;
+					DrawTile(temp, x + p_iX, y + p_iY);
+				}
+			}
 		}
 	}
 	std::vector<IEntity*> entities = p_pxTileMap->GetEntities();
@@ -88,11 +102,14 @@ void TileManager::DrawTileMap(TileMap* p_pxTileMap, int p_iX, int p_iY, int p_iX
 	{
 		if ((*it)->IsVisible())
 		{
-			if ((*it)->GetX() >= p_iXOffset && (*it)->GetX() < p_iXOffset + p_iWidth)
+			if (p_pxTileMap->IsVisible((*it)->GetX(), (*it)->GetY()))
 			{
-				if ((*it)->GetY() >= p_iYOffset && (*it)->GetY() < p_iYOffset + p_iHeight)
+				if ((*it)->GetX() >= p_iXOffset && (*it)->GetX() < p_iXOffset + p_iWidth)
 				{
-					DrawTile((*it)->GetTile(), (*it)->GetX() + p_iX - p_iXOffset, (*it)->GetY() + p_iY - p_iYOffset);
+					if ((*it)->GetY() >= p_iYOffset && (*it)->GetY() < p_iYOffset + p_iHeight)
+					{
+						DrawTile((*it)->GetTile(), (*it)->GetX() + p_iX - p_iXOffset, (*it)->GetY() + p_iY - p_iYOffset);
+					}
 				}
 			}
 		}
