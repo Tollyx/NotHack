@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <time.h>
+#include "IEntity.h"
 #include "TileMap.h"
 #include "TileManager.h"
 
@@ -44,6 +45,66 @@ TileMap::~TileMap()
 		delete m_aiTileMap[x];
 	}
 	delete m_aiTileMap;
+	{
+		auto it = m_apxEntities.begin();
+		while (it != m_apxEntities.end())
+		{
+			delete (*it);
+			(*it) = nullptr;
+			it++;
+		}
+	}
+}
+
+void TileMap::Update()
+{
+	auto it = m_apxEntities.begin();
+	while (it != m_apxEntities.end())
+	{
+		(*it)->Update();
+		it++;
+	}
+}
+
+void TileMap::AddEntity(IEntity * p_pxEntity)
+{
+	m_apxEntities.push_back(p_pxEntity);
+}
+
+void TileMap::RemoveEntity(IEntity * p_pxEntity)
+{
+	auto it = m_apxEntities.begin();
+	while (it != m_apxEntities.end())
+	{
+		if ((*it) == p_pxEntity)
+		{
+			m_apxEntities.erase(it);
+			return;
+		}
+		it++;
+	}
+}
+
+std::vector<IEntity*> TileMap::GetEntities()
+{
+	return m_apxEntities;
+}
+
+IEntity * TileMap::GetEntityAt(int p_iX, int p_iY)
+{
+	auto it = m_apxEntities.begin();
+	while (it != m_apxEntities.end())
+	{
+		if ((*it)->IsVisible())
+		{
+			if ((*it)->GetX() == p_iX && (*it)->GetY() == p_iY)
+			{
+				return (*it);
+			}
+		}
+		it++;
+	}
+	return nullptr;
 }
 
 void TileMap::SetTileset(std::vector<Tile> p_axTileset)

@@ -3,13 +3,14 @@
 #include "DrawManager.h"
 #include "SpriteManager.h"
 #include "TileMap.h"
+#include "IEntity.h"
 
 TileManager::TileManager(DrawManager* p_pxDrawManager, SpriteManager* p_pxSpriteManager)
 {
 	m_pxDrawManager = p_pxDrawManager;
 	m_pxSpriteManager = p_pxSpriteManager;
-	m_iWindowTileWidth = 32;
-	m_iWindowTileHeight = 32;
+	m_iWindowTileWidth = 52;
+	m_iWindowTileHeight = 42;
 
 	for (int i = 1; i < 256; i++)
 	{
@@ -80,6 +81,22 @@ void TileManager::DrawTileMap(TileMap* p_pxTileMap, int p_iX, int p_iY, int p_iX
 			DrawTile(p_pxTileMap->GetTile(x + p_iXOffset, y + p_iYOffset),
 				x + p_iX, y + p_iY);
 		}
+	}
+	std::vector<IEntity*> entities = p_pxTileMap->GetEntities();
+	auto it = entities.begin();
+	while (it != entities.end())
+	{
+		if ((*it)->IsVisible())
+		{
+			if ((*it)->GetX() >= p_iXOffset && (*it)->GetX() < p_iXOffset + p_iWidth)
+			{
+				if ((*it)->GetY() >= p_iYOffset && (*it)->GetY() < p_iYOffset + p_iHeight)
+				{
+					DrawTile((*it)->GetTile(), (*it)->GetX() + p_iX - p_iXOffset, (*it)->GetY() + p_iY - p_iYOffset);
+				}
+			}
+		}
+		it++;
 	}
 }
 

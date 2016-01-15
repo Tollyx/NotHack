@@ -23,8 +23,6 @@ private:
 	void NewMap();
 	System m_xSystem;
 	TileMap* m_pxMap;
-	std::vector<Sprite*> m_apxSprites;
-	std::vector<IEntity*> m_apxEntities;
 	int m_iLevelDepth;
 	int m_iTurns;
 	Player* m_pxPlayer;

@@ -103,13 +103,10 @@ bool GameState::Update(float p_fDeltaTime)
 		}
 		else
 		{
-			auto it = m_apxEntities.begin();
-			while (it != m_apxEntities.end())
 			{
-				(*it)->Update();
-				it++;
 			}
 		}
+		m_pxMap->Update();
 		m_iTurns++;
 	}
 
