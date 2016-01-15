@@ -2,12 +2,13 @@
 #include "DungeonGenerator.h"
 #include "TileManager.h"
 #include "TileMap.h"
+#include "Goblin.h"
 
 DungeonGenerator::DungeonGenerator()
 {
 }
 
-TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, int p_iSeed)
+TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, int p_iLevel, int p_iSeed)
 {
 	std::printf("Creating dungeon with width %i, height %i and density %i \n", p_iWidth, p_iHeight, p_iDensity);
 	TileMap* dungeon = new TileMap(p_iWidth, p_iHeight);
@@ -70,6 +71,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 
 	//FloodFill(0, 0, -1, 1, dungeon);
 
+	// Room generation
 	std::vector<SDL_Rect> rooms;
 
 	for (int i = 0; i < p_iDensity; i++)
@@ -104,22 +106,25 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 	}
 
 	std::printf("Successfully created %i rooms.\n", rooms.size());
-	auto it = rooms.begin();
-	while (it != rooms.end())
 	{
-		
-		for (int y = 0; y < (*it).h; y++)
+		auto it = rooms.begin();
+		while (it != rooms.end())
 		{
-			for (int x = 0; x < (*it).w; x++)
+
+			for (int y = 0; y < (*it).h; y++)
 			{
-				dungeon->SetTile(x + (*it).x, y + (*it).y, -1);
+				for (int x = 0; x < (*it).w; x++)
+				{
+					dungeon->SetTile(x + (*it).x, y + (*it).y, -1);
+				}
 			}
+			it++;
 		}
-		it++;
 	}
 
+	// Maze generation
 	// TODO: Find a more efficient way to do this.
-	// Jag menar, 4st nästlade for-loops? Det måste fan finnas ett bättre sätt.
+	// Could do straight pathways, but that would be boring.
 	for (int x = 1; x < p_iWidth - 1; x++)
 	{
 		for (int y = 1; y < p_iHeight - 1; y++)
@@ -144,6 +149,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 		}
 	}
 	
+	// Connecting the maze and rooms together
 	FloodFill(rooms.front().x, rooms.front().y, -1, 0, dungeon);
 	
 	int loop = 0;
@@ -203,53 +209,54 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 			dungeon->SetTile(connector, 4);
 			FloodFill(connector.x, connector.y, -1, 0, dungeon);
 
+			// Place some extra doors, maybe.
 			auto it = connectors.begin();
 			while (it != connectors.end())
 			{
-				int count = 0;
-				if (dungeon->GetTileId((*it).x - 1, (*it).y) == 0)
+				if (rand() % 100 < 4)
 				{
-					count++;
-				}
-				else if (dungeon->GetTileId((*it).x - 1, (*it).y) == 4)
-				{
-					it++;
-					continue;
-				}
+					int count = 0;
+					if (dungeon->GetTileId((*it).x - 1, (*it).y) == 0)
+					{
+						count++;
+					}
+					else if (dungeon->GetTileId((*it).x - 1, (*it).y) == 4)
+					{
+						it++;
+						continue;
+					}
 
-				if (dungeon->GetTileId((*it).x + 1, (*it).y) == 0)
-				{
-					count++;
-				}
-				else if (dungeon->GetTileId((*it).x + 1, (*it).y) == 4)
-				{
-					it++;
-					continue;
-				}
+					if (dungeon->GetTileId((*it).x + 1, (*it).y) == 0)
+					{
+						count++;
+					}
+					else if (dungeon->GetTileId((*it).x + 1, (*it).y) == 4)
+					{
+						it++;
+						continue;
+					}
 
-				if (dungeon->GetTileId((*it).x, (*it).y - 1) == 0)
-				{
-					count++;
-				}
-				else if (dungeon->GetTileId((*it).x, (*it).y - 1) == 4)
-				{
-					it++;
-					continue;
-				}
+					if (dungeon->GetTileId((*it).x, (*it).y - 1) == 0)
+					{
+						count++;
+					}
+					else if (dungeon->GetTileId((*it).x, (*it).y - 1) == 4)
+					{
+						it++;
+						continue;
+					}
 
-				if (dungeon->GetTileId((*it).x, (*it).y + 1) == 0)
-				{
-					count++;
-				}
-				else if (dungeon->GetTileId((*it).x, (*it).y + 1) == 4)
-				{
-					it++;
-					continue;
-				}
+					if (dungeon->GetTileId((*it).x, (*it).y + 1) == 0)
+					{
+						count++;
+					}
+					else if (dungeon->GetTileId((*it).x, (*it).y + 1) == 4)
+					{
+						it++;
+						continue;
+					}
 
-				if (count == 2)
-				{
-					if (rand() % 100 < 4)
+					if (count == 2)
 					{
 						dungeon->SetTile((*it).x, (*it).y, 4);
 					}
@@ -259,6 +266,8 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 		}
 		loop++;
 	}
+
+	// Dead-end cleanup
 	loop = 0;
 	done = false;
 	while (!done && loop < 100)
@@ -299,6 +308,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 		loop++;
 	}
 
+	// Entrance and exit placement
 	int entranceRoom;
 	int exitRoom;
 	do
@@ -321,6 +331,32 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 
 	dungeon->SetExit(exitPos);
 	dungeon->SetTile(exitPos, 3);
+
+	//Entity placement
+	{
+		int i = 0;
+		auto it = rooms.begin();
+		while (it != rooms.end())
+		{
+			if (i != entranceRoom && rand() % 100 < 90)
+			{
+				int amount = 3 + rand() % ( ( (*it).w * (*it).h) / 8);
+				while (amount > 0)
+				{
+					int x, y;
+					do
+					{
+						x = (*it).x + rand() % ((*it).w - 1);
+						y = (*it).y + rand() % ((*it).h - 1);
+					} while (dungeon->GetEntityAt(x, y) != nullptr);
+					dungeon->AddEntity(new Goblin(x, y, p_iLevel));
+					amount--;
+				}
+			}
+			i++;
+			it++;
+		}
+	}
 
 	return dungeon;
 }

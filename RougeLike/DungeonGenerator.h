@@ -5,7 +5,7 @@ class TileMap;
 class DungeonGenerator {
 public:
 	DungeonGenerator();
-	static TileMap* GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, int p_iSeed);
+	static TileMap* GenerateMap(int p_iWidth, int p_iHeight, int p_iDensity, int p_iLevel, int p_iSeed);
 
 private:
 	static bool AABB(SDL_Rect left, SDL_Rect right);
