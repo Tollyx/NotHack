@@ -95,6 +95,10 @@ bool GameState::Update(float p_fDeltaTime)
 		if ( exitPos.x == m_pxPlayer->GetX() && exitPos.y == m_pxPlayer->GetY())
 		{
 			m_iLevelDepth++;
+			if (m_iLevelDepth > 10)
+			{
+				return false; // Congrats! You win!
+			}
 			NewMap();
 		}
 		else
@@ -111,7 +115,7 @@ bool GameState::Update(float p_fDeltaTime)
 
 	if (m_pxPlayer->GetHP() <= 0)
 	{
-		return false;
+		return false; // Congrats! You lost!
 	}
 
 	return true;
@@ -197,7 +201,19 @@ void GameState::Draw()
 
 IState * GameState::NextState()
 {
-	return new MainmenuState(m_xSystem); // TODO: gameover state
+	if (m_pxPlayer->GetHP() <= 0)
+	{
+		printf("\nYou died.\n\n");
+		return new MainmenuState(m_xSystem); // TODO: gameover state
+	}
+	else if(m_iLevelDepth > 10)
+	{
+		printf("\nYou won!\n\n");
+		return new MainmenuState(m_xSystem); // TODO: win state
+	}
+	// This one should never be returned. 
+	// But if it does, the game will shut down.
+	return nullptr;
 }
 
 void GameState::NewMap()
