@@ -5,13 +5,13 @@
 
 Goblin::Goblin(int p_iX, int p_iY, int p_iLvl)
 {
-	m_Tile.spriteId = 'g';
-	m_Tile.r = 025;
-	m_Tile.g = 200;
-	m_Tile.b = 025;
-	m_Tile.description = "A goblin. Very evil. Very.";
-	m_Tile.isSolid = true;
-	m_Tile.blocksSight = false;
+	m_xTile.spriteId = 'g';
+	m_xTile.r = 025;
+	m_xTile.g = 150;
+	m_xTile.b = 025;
+	m_xTile.description = "A goblin. Very evil. Very.";
+	m_xTile.isSolid = true;
+	m_xTile.blocksSight = false;
 
 	m_iX = p_iX;
 	m_iY = p_iY;
@@ -22,6 +22,8 @@ Goblin::Goblin(int p_iX, int p_iY, int p_iLvl)
 	m_iXp = 0;
 	m_iLvl = 1;
 	m_iNextLvl = 2;
+
+	m_bVisible = true;
 
 	while (p_iLvl > m_iLvl) {
 		AddXp(m_iNextLvl);
@@ -47,7 +49,7 @@ void Goblin::Update()
 
 Tile Goblin::GetTile()
 {
-	return Tile();
+	return m_xTile;
 }
 
 int Goblin::Hurt(int p_iEnemySTR)
@@ -57,6 +59,10 @@ int Goblin::Hurt(int p_iEnemySTR)
 		dmg = 1;
 	}
 	m_iHP -= dmg;
+	if (m_iHP <= 0)
+	{
+		m_bVisible = false;
+	}
 	return dmg;
 }
 
@@ -96,10 +102,10 @@ int Goblin::GetY()
 	return m_iY;
 }
 
-void Goblin::AddXp(int p_iXp)
+bool Goblin::AddXp(int p_iXp)
 {
 	m_iXp += p_iXp;
-
+	bool lvlup = false;
 	while (m_iXp >= m_iNextLvl)
 	{
 		m_iLvl++;
@@ -109,7 +115,9 @@ void Goblin::AddXp(int p_iXp)
 		m_iDEF += m_iLvl % 2;
 		m_iMaxHP += 1;
 		m_iHP += 1;
+		lvlup = true;
 	}
+	return lvlup;
 }
 
 int Goblin::GetLvl()
@@ -124,12 +132,12 @@ int Goblin::GetXp()
 
 int Goblin::NextLvl()
 {
-	return m_iNextLvl;
+	return m_iNextLvl - m_iXp;
 }
 
 bool Goblin::IsVisible()
 {
-	return true;
+	return m_bVisible;
 }
 
 ECREATURETYPE Goblin::GetCreatureType()

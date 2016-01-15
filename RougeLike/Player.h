@@ -15,7 +15,7 @@ public:
 	int GetDEF();
 	int GetX();
 	int GetY();
-	void AddXp(int p_iXp);
+	bool AddXp(int p_iXp);
 	int GetLvl();
 	int GetXp();
 	int NextLvl();

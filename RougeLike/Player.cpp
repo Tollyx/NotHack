@@ -86,10 +86,11 @@ int Player::GetY()
 	return m_iY;
 }
 
-void Player::AddXp(int p_iXp) // TODO: Better Lvlup thing
+bool Player::AddXp(int p_iXp) // TODO: Better Lvlup thing
 {
 	m_iXp += p_iXp;
 
+	bool lvlup = false;
 	while (m_iXp >= m_iNextLvl)
 	{
 		m_iLvl++;
@@ -99,7 +100,9 @@ void Player::AddXp(int p_iXp) // TODO: Better Lvlup thing
 		m_iDEF += m_iLvl % 2;
 		m_iMaxHP += 1;
 		m_iHP += 1;
+		lvlup = true;
 	}
+	return lvlup;
 }
 
 int Player::GetLvl()
@@ -114,7 +117,7 @@ int Player::GetXp()
 
 int Player::NextLvl()
 {
-	return m_iNextLvl;
+	return m_iNextLvl - m_iXp;
 }
 
 bool Player::IsVisible()
