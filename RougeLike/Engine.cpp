@@ -41,7 +41,7 @@ bool Engine::Initialize()
 
 	// Creates a new DrawManager and calls Initialize with width / height parameters.
 	m_pxDrawManager = new DrawManager();
-	if (m_pxDrawManager->Initialize(60 * 12, 40 * 12) == false)
+	if (m_pxDrawManager->Initialize(32 * 12, 32 * 12) == false)
 	{
 		return false;
 	}

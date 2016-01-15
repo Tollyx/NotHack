@@ -26,7 +26,7 @@ void GameState::Enter()
 	m_xCamera.x = 0;
 	m_xCamera.y = 0;
 	m_xCamera.w = m_xSystem.m_pxTileManager->GetWindowTileWidth();
-	m_xCamera.h = m_xSystem.m_pxTileManager->GetWindowTileHeight() - 2;
+	m_xCamera.h = m_xSystem.m_pxTileManager->GetWindowTileHeight() - 5;
 
 	m_iLevelDepth = 0;
 	m_iTurns = 0;
@@ -133,38 +133,66 @@ void GameState::Exit()
 
 void GameState::Draw()
 {
-	m_xSystem.m_pxTileManager->DrawTileMap(m_pxMap, 0, 1, 
+	m_xSystem.m_pxTileManager->DrawTileMap(m_pxMap, 0, 0, 
 		m_xCamera.x, m_xCamera.y, 
 		m_xCamera.w, m_xCamera.h);
 
 	auto it = m_apxEntities.begin();
 	while (it != m_apxEntities.end())
 	{
-		m_xSystem.m_pxTileManager->DrawTile((*it)->GetTile(), (*it)->GetX() - m_xCamera.x, (*it)->GetY() - m_xCamera.y + 1);
+		m_xSystem.m_pxTileManager->DrawTile((*it)->GetTile(), (*it)->GetX() - m_xCamera.x, (*it)->GetY() - m_xCamera.y);
 
 		it++;
+	}
+	std::string seperator;
+	Tile temp;
+	temp.r = 0xFF;
+	temp.g = 0xFF;
+	temp.b = 0xFF;
+
+	for (int i = 0; i < m_xSystem.m_pxTileManager->GetWindowTileWidth(); i++)
+	{
+		if (i == m_xSystem.m_pxTileManager->GetWindowTileWidth() - 15)
+		{
+			temp.spriteId = 16 * 12 + 2;
+		}
+		else
+		{
+			temp.spriteId = 16 * 12 + 4;
+		}
+		m_xSystem.m_pxTileManager->DrawTile(temp, i, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 5);
+	}
+
+	// TODO: Log
+
+	temp.spriteId = 16 * 11 + 3;
+	for (int i = 0; i < 5; i++)
+	{
+		m_xSystem.m_pxTileManager->DrawTile(temp,
+			m_xSystem.m_pxTileManager->GetWindowTileWidth() - 15, m_xSystem.m_pxTileManager->GetWindowTileHeight() - i);
 	}
 
 	// Health and max health
 	m_xSystem.m_pxTileManager->DrawText(
 		"HP:" + std::to_string(m_pxPlayer->GetHP()) + "/" + std::to_string(m_pxPlayer->GetMaxHP()),
-		2, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
+		m_xSystem.m_pxTileManager->GetWindowTileWidth() - 14, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 4);
+
 
 	// Level
 	m_xSystem.m_pxTileManager->DrawText("LVL:" + std::to_string(m_pxPlayer->GetLvl()),
-		11, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
-
-	// Strength
-	m_xSystem.m_pxTileManager->DrawText("STR:" + std::to_string(m_pxPlayer->GetSTR()),
-		18, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
-
-	// Defence
-	m_xSystem.m_pxTileManager->DrawText("DEF:" + std::to_string(m_pxPlayer->GetDEF()),
-		25, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
+		m_xSystem.m_pxTileManager->GetWindowTileWidth() - 14, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 3);
 
 	// Experience to next level
 	m_xSystem.m_pxTileManager->DrawText("NXT:" + std::to_string(m_pxPlayer->NextLvl()),
-		32, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 1);
+		m_xSystem.m_pxTileManager->GetWindowTileWidth() - 7, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 3);
+
+	// Strength
+	m_xSystem.m_pxTileManager->DrawText("STR:" + std::to_string(m_pxPlayer->GetSTR()),
+		m_xSystem.m_pxTileManager->GetWindowTileWidth() - 14, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 2);
+
+	// Defence
+	m_xSystem.m_pxTileManager->DrawText("DEF:" + std::to_string(m_pxPlayer->GetDEF()),
+		m_xSystem.m_pxTileManager->GetWindowTileWidth() - 7, m_xSystem.m_pxTileManager->GetWindowTileHeight() - 2);
 }
 
 IState * GameState::NextState()
@@ -179,8 +207,8 @@ void GameState::NewMap()
 		delete m_pxMap;
 	}
 	m_pxMap = DungeonGenerator::GenerateMap(
-		m_xCamera.w / 2 + m_iLevelDepth * 2, 
-		m_xCamera.h / 2 + m_iLevelDepth * 2, 
+		30 + m_iLevelDepth * 2, 
+		30 + m_iLevelDepth * 2, 
 		16 + m_iLevelDepth * 2, 
 		std::chrono::system_clock::now().time_since_epoch().count());
 	SDL_Point entrancePos = m_pxMap->GetEntrance();

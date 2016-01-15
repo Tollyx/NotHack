@@ -8,8 +8,8 @@ TileManager::TileManager(DrawManager* p_pxDrawManager, SpriteManager* p_pxSprite
 {
 	m_pxDrawManager = p_pxDrawManager;
 	m_pxSpriteManager = p_pxSpriteManager;
-	m_iWindowTileWidth = 60;
-	m_iWindowTileHeight = 40;
+	m_iWindowTileWidth = 32;
+	m_iWindowTileHeight = 32;
 
 	for (int i = 1; i < 256; i++)
 	{
@@ -62,7 +62,7 @@ void TileManager::DrawTile(Tile p_xTile, int p_iX, int p_iY)
 	m_pxDrawManager->DrawSprite(
 		m_apxSprites[219],
 		p_iX * m_iTileWidth, p_iY * m_iTileHeight,
-		0, 0, 0); // TODO: Make background color customizable
+		0x11, 0x12, 0x13); // TODO: Make background color customizable
 
 	// Then draw the actual tile
 	m_pxDrawManager->DrawSprite(

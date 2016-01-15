@@ -63,7 +63,9 @@ void MainmenuState::Exit()
 
 void MainmenuState::Draw()
 {
-	m_xSystem.m_pxTileManager->DrawText("NotHack", 3, 4);
+	m_xSystem.m_pxTileManager->DrawText("| |  | | | _  _|", 2, 8);
+	m_xSystem.m_pxTileManager->DrawText("|\\|/\\|-|-|/.|/ |/", 2, 9);
+	m_xSystem.m_pxTileManager->DrawText("| |\\/\\_| |\\_|\\_|\\", 2, 10);
 	{
 		int i = 0;
 		auto it = m_asMenu.begin();
@@ -71,11 +73,11 @@ void MainmenuState::Draw()
 		{
 			if (i == m_iSelection)
 			{
-				m_xSystem.m_pxTileManager->DrawText(">" + (*it), 3, 6 + i);
+				m_xSystem.m_pxTileManager->DrawText(">" + (*it) + "<", 2, 12 + i);
 			}
 			else
 			{
-				m_xSystem.m_pxTileManager->DrawText((*it), 3, 6 + i);
+				m_xSystem.m_pxTileManager->DrawText((*it), 3, 12 + i);
 			}
 			i++;
 			it++;
