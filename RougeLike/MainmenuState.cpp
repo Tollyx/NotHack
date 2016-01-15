@@ -63,6 +63,7 @@ void MainmenuState::Exit()
 
 void MainmenuState::Draw()
 {
+	// Isn't the ASCII-art logo beautiful?
 	m_xSystem.m_pxTileManager->DrawText("| |  | | | _  _|", 2, 8);
 	m_xSystem.m_pxTileManager->DrawText("|\\|/\\|-|-|/.|/ |/", 2, 9);
 	m_xSystem.m_pxTileManager->DrawText("| |\\/\\_| |\\_|\\_|\\", 2, 10);

@@ -41,7 +41,7 @@ bool Engine::Initialize()
 
 	// Creates a new DrawManager and calls Initialize with width / height parameters.
 	m_pxDrawManager = new DrawManager();
-	if (m_pxDrawManager->Initialize(32 * 12, 32 * 12) == false)
+	if (m_pxDrawManager->Initialize(42 * 12, 32 * 12) == false)
 	{
 		return false;
 	}
@@ -109,7 +109,7 @@ void Engine::Update()
 	// Our engines core loop
 	while (m_bRunning)
 	{
-		if (HandleEvents()) // Only updates if needed, in other words, if a keypress happened.
+		if (HandleEvents()) // Only update if needed, in other words, if a keypress happened.
 		{
 			if (!m_pxStateManager->Update())
 			{
