@@ -22,9 +22,12 @@ public:
 private:
 	void NewMap();
 	System m_xSystem;
+	std::vector<std::string> m_asLog;
 	TileMap* m_pxMap;
 	int m_iLevelDepth;
 	int m_iTurns;
 	Player* m_pxPlayer;
 	SDL_Rect m_xCamera;
+	Mix_Chunk* m_pxHitSound;
+	Mix_Chunk* m_pxLevelupSound;
 };
