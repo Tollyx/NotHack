@@ -1,6 +1,8 @@
 #pragma once
 struct Tile;
 class IEntity;
+enum EENTITYTYPE;
+class Dijkstra;
 
 class TileMap
 {
@@ -22,13 +24,15 @@ public:
 	void SetTile(int p_iX, int p_iY, int p_iTile);
 	void SetTile(SDL_Point pos, int p_iTile);
 
-	// FOV Stuff
+	// FOV Stuff, to be moved into a "Light" class
 	void DoFOV(int p_iX, int p_iY, float p_iRadius);
 	void SetVisible(int p_iX, int p_iY, bool p_bVisible);
 	void SetSeen(int p_iX, int p_iY, bool p_bSeen);
 	bool IsVisible(int p_iX, int p_iY);
 	bool IsSeen(int p_iX, int p_iY);
 	void ClearVisible();
+
+	Dijkstra* GetDijkstra(EENTITYTYPE p_eTargetEntity);
 
 	void SetEntrance(SDL_Point pos);
 	SDL_Point GetEntrance();
@@ -49,4 +53,5 @@ private:
 	SDL_Point m_pExit;
 	std::vector<IEntity*> m_apxEntities;
 	std::vector<Tile> m_axTileset;
+	std::map<EENTITYTYPE, Dijkstra*> m_apxDijkstra;
 };

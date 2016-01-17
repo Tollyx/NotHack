@@ -10,9 +10,9 @@ struct Tile {
 	int r;
 	int g;
 	int b;
-	std::string description;
+	std::string description; // Not used yet.
 	bool isSolid;
-	bool blocksSight;
+	bool isOpaque;
 };
 
 class TileManager

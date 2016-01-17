@@ -22,7 +22,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 	wallTile.b = 200;
 	wallTile.description = "A brick wall. Pretty sturdy.";
 	wallTile.isSolid = true;
-	wallTile.blocksSight = true;
+	wallTile.isOpaque = true;
 
 	Tile floorTile;
 	floorTile.spriteId = '.';
@@ -30,7 +30,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 	floorTile.g = 200;
 	floorTile.b = 200;
 	floorTile.description = "It's the floor. You know, the thing you walk on.";
-	floorTile.blocksSight = false;
+	floorTile.isOpaque = false;
 	floorTile.isSolid = false;
 
 	Tile entranceTile;
@@ -39,7 +39,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 	entranceTile.g = 200;
 	entranceTile.b = 200;
 	entranceTile.description = "A stairway leading upwards.";
-	entranceTile.blocksSight = false;
+	entranceTile.isOpaque = false;
 	entranceTile.isSolid = false;
 
 	Tile exitTile;
@@ -48,7 +48,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 	exitTile.g = 200;
 	exitTile.b = 200;
 	exitTile.description = "A stairway leading downwards.";
-	exitTile.blocksSight = false;
+	exitTile.isOpaque = false;
 	exitTile.isSolid = false;
 
 	Tile doorTile;
@@ -57,7 +57,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 	doorTile.g = 50;
 	doorTile.b = 0;
 	doorTile.description = "A door.";
-	doorTile.blocksSight = true;
+	doorTile.isOpaque = true;
 	doorTile.isSolid = false;
 
 	std::vector<Tile> tileSet;
@@ -122,9 +122,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 		}
 	}
 
-	// Maze generation
-	// TODO: Find a more efficient way to do this.
-	// Could do straight pathways, but that would be boring.
+	// Corridor generation
 	for (int x = 1; x < p_iWidth - 1; x++)
 	{
 		for (int y = 1; y < p_iHeight - 1; y++)
@@ -143,7 +141,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 
 			if (enclosed)
 			{
-				MazeGen(x, y, dungeon);
+				Corridors(x, y, dungeon, 0);
 			}
 
 		}
@@ -307,6 +305,8 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 		}
 		loop++;
 	}
+	// Could straighten out the corridors here, to make them less winding
+
 
 	// Entrance and exit placement
 	int entranceRoom;
@@ -349,7 +349,7 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 						x = (*it).x + rand() % ((*it).w - 1);
 						y = (*it).y + rand() % ((*it).h - 1);
 					} while (dungeon->GetEntityAt(x, y) != nullptr);
-					dungeon->AddEntity(new Goblin(x, y, p_iLevel));
+					dungeon->AddEntity(new Goblin(x, y, ceil(p_iLevel)));
 					amount--;
 				}
 			}
@@ -373,8 +373,8 @@ bool DungeonGenerator::AABB(SDL_Rect left, SDL_Rect right)
 	return false;
 }
 
-// Fills an empty area with a maze. "Maze bucket-fill"
-void DungeonGenerator::MazeGen(int p_iX, int p_iY, TileMap* p_pxMap)
+// Fills an empty area with corridors.
+void DungeonGenerator::Corridors(int p_iX, int p_iY, TileMap* p_pxMap, int p_iPreviousDir)
 {
 	p_pxMap->SetTile(p_iX, p_iY, -1);
 
@@ -461,24 +461,57 @@ void DungeonGenerator::MazeGen(int p_iX, int p_iY, TileMap* p_pxMap)
 
 	if (dirs.size() != 0)
 	{
-		switch (dirs.at(std::rand() % dirs.size()))
+		bool newDir = true;
+		if (p_iPreviousDir != 0)
 		{
-		case 4: // Left
-			MazeGen(p_iX - 1, p_iY, p_pxMap);
-			break;
-		case 6: // Right
-			MazeGen(p_iX + 1, p_iY, p_pxMap);
-			break;
-		case 8: // Up
-			MazeGen(p_iX, p_iY - 1, p_pxMap);
-			break;
-		case 2: // Down
-			MazeGen(p_iX, p_iY + 1, p_pxMap);
-			break;
-		default:
-			break;
+			auto it = dirs.begin();
+			while (it != dirs.end())
+			{
+				if ((*it) == p_iPreviousDir)
+				{
+					switch (dirs.at(std::rand() % dirs.size()))
+					{
+					case 4: // Left
+						Corridors(p_iX - 1, p_iY, p_pxMap, 4);
+						break;
+					case 6: // Right
+						Corridors(p_iX + 1, p_iY, p_pxMap, 6);
+						break;
+					case 8: // Up
+						Corridors(p_iX, p_iY - 1, p_pxMap, 8);
+						break;
+					case 2: // Down
+						Corridors(p_iX, p_iY + 1, p_pxMap, 2);
+						break;
+					default:
+						break;
+					}
+					newDir = false;
+				}
+				it++;
+			}
 		}
-		MazeGen(p_iX, p_iY, p_pxMap); // Check once again to check if there's any directions to go from here
+		if (newDir)
+		{
+			switch (dirs.at(std::rand() % dirs.size()))
+			{
+			case 4: // Left
+				Corridors(p_iX - 1, p_iY, p_pxMap, 4);
+				break;
+			case 6: // Right
+				Corridors(p_iX + 1, p_iY, p_pxMap, 6);
+				break;
+			case 8: // Up
+				Corridors(p_iX, p_iY - 1, p_pxMap, 8);
+				break;
+			case 2: // Down
+				Corridors(p_iX, p_iY + 1, p_pxMap, 2);
+				break;
+			default:
+				break;
+			}
+		}
+		Corridors(p_iX, p_iY, p_pxMap, 0); // Check once again to check if there's any directions to go from here
 	}
 	else 
 	{

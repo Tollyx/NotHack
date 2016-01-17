@@ -4,7 +4,7 @@
 class Goblin : public ICreature {
 public:
 	Goblin(int p_iX, int p_iY, int p_iLvl);
-	void Update();
+	void Update(TileMap* m_pxMap);
 	Tile GetTile();
 	int Hurt(int p_iEnemySTR);
 	void SetPos(int p_iX, int p_iY);
@@ -19,7 +19,7 @@ public:
 	int GetXp();
 	int NextLvl();
 	bool IsVisible();
-	ECREATURETYPE GetCreatureType();
+	EENTITYTYPE GetSubType();
 private:
 	int m_iAIState;
 	int m_iX;
@@ -32,5 +32,6 @@ private:
 	int m_iXp;
 	int m_iNextLvl;
 	int m_iLvl;
+	int m_iAICounter;
 	bool m_bVisible;
 };

@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "AudioManager.h"
 #include "Sprite.h"
+#include "Dijkstra.h"
 #include "DungeonGenerator.h"
 #include "InputManager.h"
 #include <chrono>
@@ -42,73 +43,80 @@ bool GameState::Update(float p_fDeltaTime)
 {
 	bool update = false;
 	int dx = 0, dy = 0;
-	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_UP) || 
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_8) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_7) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_9))
+	if (m_pxPlayer->IsVisible())
 	{
-		dy--;
-		update = true;
-	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LEFT) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_4) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_7) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_1))
-	{
-		dx--;
-		update = true;
-	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_DOWN) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_2) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_1) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_3))
-	{
-		dy++;
-		update = true;
-	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_RIGHT) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_6) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_9) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_3))
-	{
-		dx++;
-		update = true;
-	}
-	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_PERIOD) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_5))
-	{
-		update = true;
-	}
+		if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_UP) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_8) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_7) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_9))
+		{
+			dy--;
+			update = true;
+		}
+		if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LEFT) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_4) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_7) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_1))
+		{
+			dx--;
+			update = true;
+		}
+		if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_DOWN) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_2) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_1) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_3))
+		{
+			dy++;
+			update = true;
+		}
+		if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_RIGHT) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_6) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_9) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_3))
+		{
+			dx++;
+			update = true;
+		}
+		if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_PERIOD) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_5))
+		{
+			update = true;
+		}
 
-	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LCTRL) &&
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_l))
-	{
-		NewMap();
-		update = true;
+		if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LCTRL) &&
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_l))
+		{
+			NewMap();
+			update = true;
+		}
+
+		if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_RETURN) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_ENTER) ||
+			m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LESS))
+		{
+			SDL_Point exitPos = m_pxMap->GetExit();
+			if (exitPos.x == m_pxPlayer->GetX() && exitPos.y == m_pxPlayer->GetY())
+			{
+				m_iLevelDepth++;
+				m_asLog.clear();
+				m_asLog.push_back("You go down the stars to floor " + std::to_string(m_iLevelDepth) + ".");
+				if (m_iLevelDepth > 8)
+				{
+					m_asLog.push_back(" ");
+					m_asLog.push_back("You reached the exit! You won!");
+					m_asLog.push_back("Press Escape to quit.");
+					return true;
+				}
+				NewMap();
+				return true;
+			}
+			m_asLog.push_back("There's no stairs here.");
+		}
 	}
 
 	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_ESCAPE))
 	{
 		return false;
-	}
-
-	if (m_xSystem.m_pxInputManager->IsKeyDown(SDLK_RETURN) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_KP_ENTER) ||
-		m_xSystem.m_pxInputManager->IsKeyDown(SDLK_LESS))
-	{
-		SDL_Point exitPos = m_pxMap->GetExit();
-		if (exitPos.x == m_pxPlayer->GetX() && exitPos.y == m_pxPlayer->GetY())
-		{
-			m_iLevelDepth++;
-			m_asLog.push_back("You go down the stars to floor " + std::to_string(m_iLevelDepth) + ".");
-			if (m_iLevelDepth > 8)
-			{
-				return false; // Congrats! You win!
-			}
-			NewMap();
-			return true;
-		}
-		m_asLog.push_back("There's no stairs here.");
 	}
 	
 	if (update) {
@@ -121,8 +129,6 @@ bool GameState::Update(float p_fDeltaTime)
 				if (entity == nullptr || !entity->IsVisible())
 				{
 					m_pxPlayer->Move(dx, dy);
-					m_pxMap->ClearVisible();
-
 					m_xCamera.x = m_pxPlayer->GetX() - m_xCamera.w / 2;
 					m_xCamera.y = m_pxPlayer->GetY() - m_xCamera.h / 2;
 				}
@@ -137,8 +143,9 @@ bool GameState::Update(float p_fDeltaTime)
 					if (mob->GetHP() <= 0)
 					{
 						m_asLog.push_back("The goblin died.");
-						m_asLog.push_back("You gained " + std::to_string((int)(mob->GetLvl() * 1.5)) + "xp!");
-						if (m_pxPlayer->AddXp(mob->GetLvl() * 1.5)) {
+						int xp = mob->GetLvl() + (rand() % (mob->GetLvl() + 1));
+						m_asLog.push_back("You gained " + std::to_string(xp) + "xp!");
+						if (m_pxPlayer->AddXp(xp)) {
 							m_xSystem.m_pxAudioManager->PlaySound(m_pxLevelupSound, 0.4f);
 							m_asLog.push_back("You gained a level!");
 						}
@@ -146,14 +153,19 @@ bool GameState::Update(float p_fDeltaTime)
 				}
 			}
 		}
+		m_pxMap->GetDijkstra(m_pxPlayer->GetSubType())->Update();
 		m_pxMap->Update();
+		if (m_pxPlayer->GetHP() <= 0)
+		{
+			m_asLog.push_back(" ");
+			m_asLog.push_back("You died on floor " + std::to_string(m_iLevelDepth) + ".");
+			m_asLog.push_back("Press Escape to quit.");
+			//return false; // Congrats! You lost!
+		}
+
+		m_pxMap->ClearVisible();
 		m_pxMap->DoFOV(m_pxPlayer->GetX(), m_pxPlayer->GetY(), 16);
 		m_iTurns++;
-	}
-
-	if (m_pxPlayer->GetHP() <= 0)
-	{
-		return false; // Congrats! You lost!
 	}
 
 	return true;
@@ -161,6 +173,7 @@ bool GameState::Update(float p_fDeltaTime)
 
 void GameState::Exit()
 {
+	m_pxMap->RemoveEntity(m_pxPlayer);
 	delete m_pxMap;
 	m_pxMap = nullptr;
 	if (m_pxPlayer != nullptr)
@@ -243,19 +256,7 @@ void GameState::Draw()
 
 IState * GameState::NextState()
 {
-	if (m_pxPlayer->GetHP() <= 0)
-	{
-		printf("\nYou died.\n\n");
-		return new MainmenuState(m_xSystem); // TODO: gameover state
-	}
-	else if(m_iLevelDepth > 10)
-	{
-		printf("\nYou won!\n\n");
-		return new MainmenuState(m_xSystem); // TODO: win state
-	}
-	// This one should never be returned. 
-	// But if it does, the game will shut down.
-	return nullptr;
+	return new MainmenuState(m_xSystem);
 }
 
 void GameState::NewMap()
@@ -269,7 +270,7 @@ void GameState::NewMap()
 		30 + m_iLevelDepth * 2, 
 		30 + m_iLevelDepth * 2, 
 		16 + m_iLevelDepth * 2, 
-		m_iLevelDepth * 2,
+		m_iLevelDepth * 1.5,
 		std::chrono::system_clock::now().time_since_epoch().count());
 	SDL_Point entrancePos = m_pxMap->GetEntrance();
 	m_pxPlayer->SetPos(entrancePos.x, entrancePos.y);

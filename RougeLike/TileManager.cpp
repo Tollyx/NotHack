@@ -4,6 +4,7 @@
 #include "SpriteManager.h"
 #include "TileMap.h"
 #include "IEntity.h"
+#include "Dijkstra.h"
 
 TileManager::TileManager(DrawManager* p_pxDrawManager, SpriteManager* p_pxSpriteManager)
 {
@@ -80,6 +81,8 @@ void TileManager::DrawTileMap(TileMap* p_pxTileMap, int p_iX, int p_iY, int p_iX
 		{
 			if (p_pxTileMap->IsSeen(x + p_iXOffset, y + p_iYOffset))
 			{
+				Tile temp = p_pxTileMap->GetTile(x + p_iXOffset, y + p_iYOffset);
+				
 				if (p_pxTileMap->IsVisible(x + p_iXOffset, y + p_iYOffset))
 				{
 					DrawTile(p_pxTileMap->GetTile(x + p_iXOffset, y + p_iYOffset),
@@ -87,10 +90,9 @@ void TileManager::DrawTileMap(TileMap* p_pxTileMap, int p_iX, int p_iY, int p_iX
 				}
 				else
 				{
-					Tile temp = p_pxTileMap->GetTile(x + p_iXOffset, y + p_iYOffset);
-					temp.r -= 150;
-					temp.g -= 150;
-					temp.b -= 100;
+					temp.r /= 3;
+					temp.g /= 3;
+					temp.b /= 2;
 					DrawTile(temp, x + p_iX, y + p_iY);
 				}
 			}

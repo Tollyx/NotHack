@@ -4,7 +4,7 @@
 class Player : public ICreature {
 public:
 	Player(int p_iX, int p_iY);
-	void Update();
+	void Update(TileMap* m_pxMap);
 	Tile GetTile();
 	int Hurt(int p_iEnemySTR);
 	void Move(int p_iX, int p_iY);
@@ -20,8 +20,9 @@ public:
 	int GetXp();
 	int NextLvl();
 	bool IsVisible();
-	ECREATURETYPE GetCreatureType();
+	EENTITYTYPE GetSubType();
 private:
+	bool m_bVisible;
 	int m_iX;
 	int m_iY;
 	Tile m_Tile;

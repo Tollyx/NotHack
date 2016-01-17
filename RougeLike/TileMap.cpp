@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include <time.h>
 #include "IEntity.h"
+#include "ICreature.h"
+#include "Dijkstra.h"
 #include "TileMap.h"
 #include "TileManager.h"
 
@@ -45,12 +47,23 @@ TileMap::~TileMap()
 		delete m_aiTileMap[x];
 	}
 	delete m_aiTileMap;
+
 	{
 		auto it = m_apxEntities.begin();
 		while (it != m_apxEntities.end())
 		{
 			delete (*it);
 			(*it) = nullptr;
+			it++;
+		}
+	}
+
+	{
+		auto it = m_apxDijkstra.begin();
+		while (it != m_apxDijkstra.end())
+		{
+			delete it->second;
+			it->second = nullptr;
 			it++;
 		}
 	}
@@ -61,7 +74,10 @@ void TileMap::Update()
 	auto it = m_apxEntities.begin();
 	while (it != m_apxEntities.end())
 	{
-		(*it)->Update();
+		if ((*it)->IsVisible())
+		{
+			(*it)->Update(this);
+		}
 		it++;
 	}
 }
@@ -131,7 +147,7 @@ Tile TileMap::GetTile(int p_iX, int p_iY)
 	blank.g = 0;
 	blank.b = 0;
 	blank.isSolid = false;
-	blank.blocksSight = false;
+	blank.isOpaque = false;
 	blank.description = "Nothing.";
 	blank.spriteId = ' ';
 
@@ -169,6 +185,7 @@ void TileMap::SetTile(SDL_Point pos, int p_iTile)
 void TileMap::DoFOV(int p_iX, int p_iY, float p_iRadius)
 {
 	SetVisible(p_iX, p_iY, true);
+	// Once for each octant
 	CastLight(1, 1.0f, 0.0f, 0, -1, -1, 0, p_iX, p_iY, p_iRadius);
 	CastLight(1, 1.0f, 0.0f, -1, 0, 0, -1, p_iX, p_iY, p_iRadius);
 	CastLight(1, 1.0f, 0.0f, 0, 1, -1, 0, p_iX, p_iY, p_iRadius);
@@ -240,6 +257,17 @@ void TileMap::ClearVisible()
 	}
 }
 
+Dijkstra * TileMap::GetDijkstra(EENTITYTYPE p_eTargetEntity)
+{
+	auto it = m_apxDijkstra.find(p_eTargetEntity);
+	if (it == m_apxDijkstra.end())
+	{
+		m_apxDijkstra.insert(std::pair<EENTITYTYPE, Dijkstra*>(p_eTargetEntity, new Dijkstra(this, p_eTargetEntity)));
+		it = m_apxDijkstra.find(p_eTargetEntity);
+	}
+	return it->second;
+}
+
 void TileMap::SetEntrance(SDL_Point pos)
 {
 	m_pEntrance = pos;
@@ -288,8 +316,8 @@ void TileMap::CastLight(int row, float start, float end, int xx, int xy, int yx,
 		{
 			int currentX = startX + deltaX * xx + deltaY * xy;
 			int currentY = startY + deltaX * yx + deltaY * yy;
-			float leftSlope = (deltaX - 0.5f) / (deltaY + 0.0f);
-			float rightSlope = (deltaX + 0.5f) / (deltaY - 0.0f);
+			float leftSlope = (deltaX - 0.5f) / (deltaY + 0.5f);
+			float rightSlope = (deltaX + 0.5f) / (deltaY - 0.5f);
 
 			if (!(currentX >= 0 && currentY >= 0 && currentX < GetWidth() && currentY < GetHeight()) || start < rightSlope)
 			{
@@ -307,7 +335,7 @@ void TileMap::CastLight(int row, float start, float end, int xx, int xy, int yx,
 
 			if (blocked)
 			{
-				if (GetTile(currentX, currentY).blocksSight)
+				if (GetTile(currentX, currentY).isOpaque)
 				{
 					newStart = rightSlope;
 					continue;
@@ -320,7 +348,7 @@ void TileMap::CastLight(int row, float start, float end, int xx, int xy, int yx,
 			}
 			else
 			{
-				if (GetTile(currentX, currentY).blocksSight && distance < radius)
+				if (GetTile(currentX, currentY).isOpaque && distance < radius)
 				{
 					blocked = true;
 					CastLight(distance + 1, start, leftSlope, xx, xy, yx, yy, startX, startY, radius);

@@ -11,7 +11,7 @@ Player::Player(int p_iX, int p_iY)
 	m_Tile.b = 255;
 	m_Tile.description = "This is you. A human. Probably.";
 	m_Tile.isSolid = true;
-	m_Tile.blocksSight = false;
+	m_Tile.isOpaque = false;
 
 	m_iX = p_iX;
 	m_iY = p_iY;
@@ -22,11 +22,16 @@ Player::Player(int p_iX, int p_iY)
 	m_iXp = 0;
 	m_iLvl = 1; 
 	m_iNextLvl = 2;
+	m_bVisible = true;
 }
 
-void Player::Update()
+void Player::Update(TileMap* m_pxMap)
 {
-	return;
+	m_iHP++;
+	if (m_iHP > m_iMaxHP)
+	{
+		m_iHP = m_iMaxHP;
+	}
 }
 
 Tile Player::GetTile()
@@ -36,11 +41,27 @@ Tile Player::GetTile()
 
 int Player::Hurt(int p_iEnemySTR)
 {
-	int dmg = p_iEnemySTR - m_iDEF; // Pretty basic for now.
-	if (dmg < 1) {
-		dmg = 1;
+	int roll1 = p_iEnemySTR / 2 + rand() % p_iEnemySTR;
+	int roll2 = p_iEnemySTR / 2 + rand() % p_iEnemySTR;
+
+	int dmg;
+	if (roll1 > roll2)
+	{
+		dmg = roll1 - m_iDEF;
 	}
-	m_iHP -= dmg;
+	else
+	{
+		dmg = roll2 - m_iDEF;
+	}
+	if (dmg < 0) {
+		dmg = 0;
+	}
+
+	m_iHP -= dmg + 1; // +1 to negate the 1hp heal per turn thing.
+	if (m_iHP <= 0)
+	{
+		m_bVisible = false;
+	}
 	return dmg;
 }
 
@@ -122,10 +143,10 @@ int Player::NextLvl()
 
 bool Player::IsVisible()
 {
-	return true;
+	return m_bVisible;
 }
 
-ECREATURETYPE Player::GetCreatureType()
+EENTITYTYPE Player::GetSubType()
 {
-	return ECREATURETYPE::ENTITY_CREATURE_PLAYER;
+	return EENTITYTYPE::ENTITY_CR_PLAYER;
 }

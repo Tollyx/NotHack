@@ -1,12 +1,6 @@
 #pragma once
 #include "IEntity.h"
 
-enum ECREATURETYPE 
-{
-	ENTITY_CREATURE_PLAYER,
-	ENTITY_CREATURE_GOBLIN
-};
-
 class ICreature : public IEntity {
 public:
 	virtual int GetHP() = 0;
@@ -19,6 +13,5 @@ public:
 	virtual int GetLvl() = 0;
 	virtual int GetXp() = 0;
 	virtual int NextLvl() = 0;
-	virtual ECREATURETYPE GetCreatureType() = 0;
 	EENTITYTYPE GetType() { return EENTITYTYPE::ENTITY_CREATURE; };
 };
