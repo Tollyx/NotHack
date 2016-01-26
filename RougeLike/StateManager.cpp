@@ -26,7 +26,15 @@ bool StateManager::Update()
 	{
 		if (m_pxCurrentState->Update(fDeltaTime) == false)
 		{
-			SetState(m_pxCurrentState->NextState());
+			IState* nextState = m_pxCurrentState->NextState();
+			if (nextState != nullptr)
+			{
+				SetState(nextState);
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
 	return true;

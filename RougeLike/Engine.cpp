@@ -2,11 +2,16 @@
 #include "Engine.h"
 #include "DrawManager.h"
 #include "SpriteManager.h"
+#include "TileManager.h"
+#include "AudioManager.h"
 #include "StateManager.h"
 #include "IState.h"
+#include "MainmenuState.h"
 #include "GameState.h"
 #include "Sprite.h"
+#include "Keyboard.h"
 #include "Mouse.h"
+#include "InputManager.h"
 #include <iostream>
 
 Engine::Engine()
@@ -36,23 +41,36 @@ bool Engine::Initialize()
 
 	// Creates a new DrawManager and calls Initialize with width / height parameters.
 	m_pxDrawManager = new DrawManager();
-	if (m_pxDrawManager->Initialize(640, 480) == false)
+	if (m_pxDrawManager->Initialize(42 * 12, 32 * 12) == false)
 	{
 		return false;
 	}
+
+	m_pxAudioManager = new AudioManager();
+	if (m_pxAudioManager->Initialize() == false)
+	{
+		return false;
+	}
+
 	m_pxMouse = new Mouse();
+	m_pxKeyboard = new Keyboard();
+
+	m_pxInputManager = new InputManager(m_pxMouse, m_pxKeyboard);
 
 	m_pxSpriteManager = new SpriteManager(m_pxDrawManager->GetRenderer());
+
+	m_pxTileManager = new TileManager(m_pxDrawManager, m_pxSpriteManager);
+	m_pxTileManager->SetTileSet("../assets/12x12.bmp", 12, 12);
+	//m_pxTileManager->SetTileSet("../assets/16x16.bmp", 16, 16);
+	//m_pxTileManager->SetTileSet("../assets/24x24.bmp", 24, 24);
 
 	m_pxStateManager = new StateManager();
 
 	System system;
-	system.m_iScreenWidth = 640;
-	system.m_iScreenHeight = 480;
-	system.m_pxDrawManager = m_pxDrawManager;
-	system.m_pxSpriteManager = m_pxSpriteManager;
-	system.m_pxMouse = m_pxMouse;
-	m_pxStateManager->SetState(new GameState(system));
+	system.m_pxTileManager = m_pxTileManager;
+	system.m_pxAudioManager = m_pxAudioManager;
+	system.m_pxInputManager = m_pxInputManager;
+	m_pxStateManager->SetState(new MainmenuState(system));
 
 	m_bRunning = true;
 
@@ -71,6 +89,13 @@ void Engine::Shutdown()
 	delete m_pxMouse;
 	m_pxMouse = nullptr;
 
+	delete m_pxKeyboard;
+	m_pxKeyboard = nullptr;
+
+	m_pxAudioManager->Shutdown();
+	delete m_pxAudioManager;
+	m_pxAudioManager = nullptr;
+
 	// Shuts down the drawmanager before deleting the object and nulling the pointer.
 	m_pxDrawManager->Shutdown();
 	delete m_pxDrawManager;
@@ -81,25 +106,27 @@ void Engine::Shutdown()
 
 void Engine::Update()
 {
-
 	// Our engines core loop
 	while (m_bRunning)
 	{
-		HandleEvents();
-		if (!m_pxStateManager->Update()) 
+		if (HandleEvents()) // Only update if needed, in other words, if a keypress happened.
 		{
-			m_bRunning = false;
+			if (!m_pxStateManager->Update())
+			{
+				m_bRunning = false;
+			}
 		}
 		m_pxDrawManager->Clear();
 		m_pxStateManager->Draw();
-		
+
 		m_pxDrawManager->Present();
-		SDL_Delay(10);
+		SDL_Delay(1000 / 60);
 	}
 }
 
-void Engine::HandleEvents()
+bool Engine::HandleEvents()
 {
+	bool needsUpdate = false;
 	SDL_Event xEvent;
 	while (SDL_PollEvent(&xEvent))
 	{
@@ -110,6 +137,7 @@ void Engine::HandleEvents()
 		else if (xEvent.type == SDL_MOUSEBUTTONDOWN)
 		{
 			m_pxMouse->SetButton(xEvent.button.button, true);
+			//needsUpdate = true;
 		}
 		else if (xEvent.type == SDL_MOUSEBUTTONUP)
 		{
@@ -119,5 +147,18 @@ void Engine::HandleEvents()
 		{
 			m_pxMouse->SetPosition(xEvent.motion.x, xEvent.motion.y);
 		}
+		else if (xEvent.type == SDL_KEYDOWN)
+		{
+			//printf("Keydown: %i\n", xEvent.key.keysym.sym);
+			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, true);
+			needsUpdate = true;
+		}
+		else if (xEvent.type == SDL_KEYUP)
+		{
+			//printf("Keyup: %i\n", xEvent.key.keysym.sym);
+			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, false);
+			//needsUpdate = true;
+		}
 	}
+	return needsUpdate;
 }

@@ -1,16 +1,14 @@
 #pragma once
 
-class SpriteManager;
-class DrawManager;
-class Mouse;
+class TileManager;
+class InputManager;
+class AudioManager;
 
 struct System
 {
-	int m_iScreenWidth;
-	int m_iScreenHeight;
-	SpriteManager* m_pxSpriteManager;
-	DrawManager* m_pxDrawManager;
-	Mouse* m_pxMouse;
+	TileManager* m_pxTileManager;
+	AudioManager* m_pxAudioManager;
+	InputManager* m_pxInputManager;
 };
 
 class IState

@@ -3,46 +3,64 @@
 #include "Collider.h"
 #include <math.h>
 
-bool CollisionManager::Check(Collider * p_pxShapeA, Collider * p_pxShapeB, 
-	int & p_iOverlapX, int & p_iOverlapY)
+bool CollisionManager::AABB(Collider * p_pxShapeA, Collider * p_pxShapeB)
 {
-	int iACenterX = p_pxShapeA->GetX() + p_pxShapeA->GetW() / 2;
-	int iBCenterX = p_pxShapeB->GetX() + p_pxShapeB->GetW() / 2;
-	int iCenterDeltaX = iACenterX - iBCenterX;
+	float iACenterX = p_pxShapeA->GetX() + p_pxShapeA->GetW() / 2;
+	float iBCenterX = p_pxShapeB->GetX() + p_pxShapeB->GetW() / 2;
+	float iCenterDeltaX = iACenterX - iBCenterX;
 
 	if (abs(iCenterDeltaX) < (p_pxShapeA->GetW() / 2 + p_pxShapeB->GetW() / 2)) 
 	{
-		int iACenterY = p_pxShapeA->GetY() + p_pxShapeA->GetH() / 2;
-		int iBCenterY = p_pxShapeB->GetY() + p_pxShapeB->GetH() / 2;
-		int iCenterDeltaY = iACenterY - iBCenterY;
+		float iACenterY = p_pxShapeA->GetY() + p_pxShapeA->GetH() / 2;
+		float iBCenterY = p_pxShapeB->GetY() + p_pxShapeB->GetH() / 2;
+		float iCenterDeltaY = iACenterY - iBCenterY;
 
 		if (abs(iCenterDeltaY) < (p_pxShapeA->GetH() / 2 + p_pxShapeB->GetH() / 2))
 		{
-			int iDeltaX = (p_pxShapeA->GetW() + p_pxShapeB->GetW()) / 2 - abs(iCenterDeltaX);
-			int iDeltaY = (p_pxShapeA->GetH() + p_pxShapeB->GetH()) / 2 - abs(iCenterDeltaY);
+			return true;
+		}
+	}
+	return false;
+}
 
-			if (iDeltaX < iDeltaY)
-			{
-				if (iDeltaX < 0) {
-					p_iOverlapX = -iDeltaX;
-				}
-				else
-				{
-					p_iOverlapX = iDeltaX;
-				}
+bool CollisionManager::AABB(Collider * p_pxShapeA, Collider * p_pxShapeB,
+	float & p_iOverlapX, float & p_iOverlapY)
+{
+	if (AABB(p_pxShapeA, p_pxShapeB))
+	{
+		float iACenterX = p_pxShapeA->GetX() + p_pxShapeA->GetW() / 2;
+		float iBCenterX = p_pxShapeB->GetX() + p_pxShapeB->GetW() / 2;
+		float iCenterDeltaX = iACenterX - iBCenterX;
+
+		float iACenterY = p_pxShapeA->GetY() + p_pxShapeA->GetH() / 2;
+		float iBCenterY = p_pxShapeB->GetY() + p_pxShapeB->GetH() / 2;
+		float iCenterDeltaY = iACenterY - iBCenterY;
+
+		float iDeltaX = (p_pxShapeA->GetW() + p_pxShapeB->GetW()) / 2 - abs(iCenterDeltaX);
+		float iDeltaY = (p_pxShapeA->GetH() + p_pxShapeB->GetH()) / 2 - abs(iCenterDeltaY);
+
+		if (iDeltaX < iDeltaY)
+		{
+			if (iDeltaX < 0) {
+				p_iOverlapX = -iDeltaX;
 			}
 			else
 			{
-				if (iDeltaY < 0) {
-					p_iOverlapY = -iDeltaY;
-				}
-				else
-				{
-					p_iOverlapY = iDeltaY;
-				}
+				p_iOverlapX = iDeltaX;
 			}
-			return true;
 		}
+		else
+		{
+			if (iDeltaY < 0) {
+				p_iOverlapY = -iDeltaY;
+			}
+			else
+			{
+				p_iOverlapY = iDeltaY;
+			}
+		}
+
+		return true;
 	}
 	return false;
 }

@@ -15,6 +15,7 @@
 // TODO: reference additional headers your program requires here
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <string>
 #include <vector>
 #include <map>

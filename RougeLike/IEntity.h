@@ -1,10 +1,17 @@
 #pragma once
 
+struct Tile;
+class TileMap;
+
 enum EENTITYTYPE
 {
-	ENTITY_PADDLE,
-	ENTITY_BALL,
-	ENTITY_BRICK
+	ENTITY_CREATURE,
+	ENTITY_CR_PLAYER,
+	ENTITY_CR_MOB,
+
+	ENTITY_ITEM,
+	ENTITY_IT_EQUIPMENT,
+	ENTITY_IT_CONSUMABLE
 };
 
 class Sprite;
@@ -14,11 +21,12 @@ class IEntity
 {
 public:
 	~IEntity() {};
-	virtual void Update(float p_fDeltaTime) = 0;
-	virtual Sprite* GetSprite() = 0; // Can return null if no sprite
-	virtual Collider* GetCollider() = 0;
-	virtual float GetX() = 0;
-	virtual float GetY() = 0;
+	virtual void Update(TileMap* m_pxMap) = 0;
+	virtual Tile GetTile() = 0;
+	virtual int GetX() = 0;
+	virtual int GetY() = 0;
+	virtual void SetPos(int p_iX, int p_iY) = 0;
 	virtual bool IsVisible() = 0;
 	virtual EENTITYTYPE GetType() = 0;
+	virtual EENTITYTYPE GetSubType() = 0;
 };

@@ -2,8 +2,12 @@
 
 #include "IState.h"
 
-class Map;
+class TileMap;
 class Sprite;
+class Player;
+class IEntity;
+class SDL_Rect;
+class Mix_Chunk;
 
 class GameState : public IState
 {
@@ -16,10 +20,14 @@ public:
 	void Draw();
 	IState* NextState();
 private:
+	void NewMap();
 	System m_xSystem;
-	Map* m_pxMap;
-	std::vector<Sprite*> m_apxSprites;
-	Sprite* test;
-	int m_iScreenTileWidth;
-	int m_iScreenTileHeight;
+	std::vector<std::string> m_asLog;
+	TileMap* m_pxMap;
+	int m_iLevelDepth;
+	int m_iTurns;
+	Player* m_pxPlayer;
+	SDL_Rect m_xCamera;
+	Mix_Chunk* m_pxHitSound;
+	Mix_Chunk* m_pxLevelupSound;
 };
