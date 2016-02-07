@@ -301,6 +301,11 @@ TileMap* DungeonGenerator::GenerateMap(int p_iWidth, int p_iHeight, int p_iDensi
 						done = false;
 					}
 				}
+				else if (dungeon->GetTileId(x, y) == -1)
+				{
+					dungeon->SetTile(x, y, 1);
+					done = false;
+				}
 			}
 		}
 		loop++;
