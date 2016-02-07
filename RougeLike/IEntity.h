@@ -21,7 +21,7 @@ class IEntity
 {
 public:
 	~IEntity() {};
-	virtual void Update(TileMap* m_pxMap) = 0;
+	virtual void Update(TileMap* m_pxMap, std::vector<std::string> &p_asLog) = 0;
 	virtual Tile GetTile() = 0;
 	virtual int GetX() = 0;
 	virtual int GetY() = 0;

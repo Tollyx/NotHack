@@ -11,7 +11,7 @@ public:
 	~TileMap();
 
 	// Entity stuff
-	void Update(); // Updates all entities on the map.
+	void Update(std::vector<std::string> &p_asLog); // Updates all entities on the map.
 	void AddEntity(IEntity* p_pxEntity); // Adds an entity to the map. It will be deleted with the map unless you remove it.
 	void RemoveEntity(IEntity* p_pxEntity); // NOTE: Will NOT delete the entity. Will only remove the entity from the map.
 	std::vector<IEntity*> GetEntities();

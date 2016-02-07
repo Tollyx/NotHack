@@ -1,15 +1,14 @@
 #include "stdafx.h"
 #include "GameState.h"
-#include "MainmenuState.h"
 #include "TileManager.h"
 #include "TileMap.h"
 #include "Player.h"
 #include "AudioManager.h"
-#include "Sprite.h"
 #include "Dijkstra.h"
 #include "DungeonGenerator.h"
 #include "InputManager.h"
 #include <chrono>
+#include "GameOverState.h"
 
 GameState::GameState(System& p_xSystem)
 {
@@ -31,6 +30,7 @@ void GameState::Enter()
 
 	m_iLevelDepth = 1;
 	m_iTurns = 0;
+	m_iKills = 0;
 
 	m_pxHitSound = m_xSystem.m_pxAudioManager->LoadSound("../assets/Hit.wav");
 	m_pxLevelupSound = m_xSystem.m_pxAudioManager->LoadSound("../assets/Levelup.wav");
@@ -143,6 +143,7 @@ bool GameState::Update(float p_fDeltaTime)
 					if (mob->GetHP() <= 0)
 					{
 						m_asLog.push_back("The goblin died.");
+						m_iKills++;
 						int xp = mob->GetLvl() + (rand() % (mob->GetLvl() + 1));
 						m_asLog.push_back("You gained " + std::to_string(xp) + "xp!");
 						if (m_pxPlayer->AddXp(xp)) {
@@ -154,7 +155,7 @@ bool GameState::Update(float p_fDeltaTime)
 			}
 		}
 		m_pxMap->GetDijkstra(m_pxPlayer->GetSubType())->Update();
-		m_pxMap->Update();
+		m_pxMap->Update(m_asLog);
 		if (m_pxPlayer->GetHP() <= 0)
 		{
 			m_asLog.push_back(" ");
@@ -219,7 +220,7 @@ void GameState::Draw()
 		{
 			m_xSystem.m_pxTileManager->DrawText((*it), 1, height - 1 - i);
 			i++;
-			it++;
+			++it;
 		}
 	}
 
@@ -256,7 +257,13 @@ void GameState::Draw()
 
 IState * GameState::NextState()
 {
-	return new MainmenuState(m_xSystem);
+	GameOverData gameover;
+	gameover.killedBy = "Goblin"; // Still nothing but goblins in here.
+	gameover.kills = m_iKills;
+	gameover.level = m_pxPlayer->GetLvl();
+	gameover.turns = m_iTurns;
+	gameover.floor = m_iLevelDepth;
+	return new GameOverState(m_xSystem, gameover);
 }
 
 void GameState::NewMap()

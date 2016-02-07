@@ -1,6 +1,8 @@
 #pragma once
 #include "IState.h"
 
+class Sprite;
+
 class MainmenuState : public IState
 {
 public:

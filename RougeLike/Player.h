@@ -4,7 +4,7 @@
 class Player : public ICreature {
 public:
 	Player(int p_iX, int p_iY);
-	void Update(TileMap* m_pxMap);
+	void Update(TileMap* m_pxMap, std::vector<std::string> &p_asLog);
 	Tile GetTile();
 	int Hurt(int p_iEnemySTR);
 	void Move(int p_iX, int p_iY);

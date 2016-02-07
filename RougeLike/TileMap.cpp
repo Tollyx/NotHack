@@ -69,14 +69,14 @@ TileMap::~TileMap()
 	}
 }
 
-void TileMap::Update()
+void TileMap::Update(std::vector<std::string> &p_asLog)
 {
 	auto it = m_apxEntities.begin();
 	while (it != m_apxEntities.end())
 	{
 		if ((*it)->IsVisible())
 		{
-			(*it)->Update(this);
+			(*it)->Update(this, p_asLog);
 		}
 		it++;
 	}

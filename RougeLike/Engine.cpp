@@ -52,10 +52,7 @@ bool Engine::Initialize()
 		return false;
 	}
 
-	m_pxMouse = new Mouse();
-	m_pxKeyboard = new Keyboard();
-
-	m_pxInputManager = new InputManager(m_pxMouse, m_pxKeyboard);
+	m_pxInputManager = new InputManager();
 
 	m_pxSpriteManager = new SpriteManager(m_pxDrawManager->GetRenderer());
 
@@ -134,30 +131,9 @@ bool Engine::HandleEvents()
 		{
 			m_bRunning = false;
 		}
-		else if (xEvent.type == SDL_MOUSEBUTTONDOWN)
+		else
 		{
-			m_pxMouse->SetButton(xEvent.button.button, true);
-			//needsUpdate = true;
-		}
-		else if (xEvent.type == SDL_MOUSEBUTTONUP)
-		{
-			m_pxMouse->SetButton(xEvent.button.button, false);
-		}
-		else if (xEvent.type == SDL_MOUSEMOTION)
-		{
-			m_pxMouse->SetPosition(xEvent.motion.x, xEvent.motion.y);
-		}
-		else if (xEvent.type == SDL_KEYDOWN)
-		{
-			//printf("Keydown: %i\n", xEvent.key.keysym.sym);
-			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, true);
-			needsUpdate = true;
-		}
-		else if (xEvent.type == SDL_KEYUP)
-		{
-			//printf("Keyup: %i\n", xEvent.key.keysym.sym);
-			m_pxKeyboard->SetKey(xEvent.key.keysym.sym, false);
-			//needsUpdate = true;
+			needsUpdate = m_pxInputManager->Update(xEvent);
 		}
 	}
 	return needsUpdate;

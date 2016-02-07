@@ -4,7 +4,7 @@
 class Goblin : public ICreature {
 public:
 	Goblin(int p_iX, int p_iY, int p_iLvl);
-	void Update(TileMap* m_pxMap);
+	void Update(TileMap* m_pxMap, std::vector<std::string> &p_asLog);
 	Tile GetTile();
 	int Hurt(int p_iEnemySTR);
 	void SetPos(int p_iX, int p_iY);

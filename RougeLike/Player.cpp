@@ -25,7 +25,7 @@ Player::Player(int p_iX, int p_iY)
 	m_bVisible = true;
 }
 
-void Player::Update(TileMap* m_pxMap)
+void Player::Update(TileMap* m_pxMap, std::vector<std::string> &p_asLog)
 {
 	m_iHP++;
 	if (m_iHP > m_iMaxHP)
@@ -53,11 +53,11 @@ int Player::Hurt(int p_iEnemySTR)
 	{
 		dmg = roll2 - m_iDEF;
 	}
-	if (dmg < 0) {
-		dmg = 0;
+	if (dmg < 1) {
+		dmg = 1;
 	}
 
-	m_iHP -= dmg + 1; // +1 to negate the 1hp heal per turn thing.
+	m_iHP -= dmg;
 	if (m_iHP <= 0)
 	{
 		m_bVisible = false;

@@ -33,7 +33,7 @@ Goblin::Goblin(int p_iX, int p_iY, int p_iLvl)
 	}
 }
 
-void Goblin::Update(TileMap* m_pxMap)
+void Goblin::Update(TileMap* m_pxMap, std::vector<std::string> &p_asLog)
 {
 	if (m_pxMap->IsVisible(m_iX, m_iY))
 	{
@@ -75,12 +75,16 @@ void Goblin::Update(TileMap* m_pxMap)
 		{
 			for (int dy = -1; dy <= 1; dy++)
 			{
-				int temp = playerPath->GetValue(m_iX + dx, m_iY + dy);
-				if (temp < lowest)
+				IEntity* entity = m_pxMap->GetEntityAt(m_iX + dx, m_iY + dy);
+				if (entity == nullptr || entity->GetSubType() != ENTITY_CR_MOB)
 				{
-					lowest = temp;
-					newX = m_iX + dx;
-					newY = m_iY + dy;
+					int temp = playerPath->GetValue(m_iX + dx, m_iY + dy);
+					if (temp < lowest)
+					{
+						lowest = temp;
+						newX = m_iX + dx;
+						newY = m_iY + dy;
+					}
 				}
 			}
 		}
@@ -90,7 +94,8 @@ void Goblin::Update(TileMap* m_pxMap)
 			if (tempEntity->GetSubType() == EENTITYTYPE::ENTITY_CR_PLAYER)
 			{
 				ICreature* tempCreature = static_cast<ICreature*>(tempEntity);
-				tempCreature->Hurt(m_iSTR);
+				int dmg = tempCreature->Hurt(m_iSTR);
+				p_asLog.push_back("Goblin hit you for " + std::to_string(dmg) + " damage.");
 			}
 		}
 		else

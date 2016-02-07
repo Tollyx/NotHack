@@ -26,6 +26,7 @@ private:
 	TileMap* m_pxMap;
 	int m_iLevelDepth;
 	int m_iTurns;
+	int m_iKills;
 	Player* m_pxPlayer;
 	SDL_Rect m_xCamera;
 	Mix_Chunk* m_pxHitSound;

@@ -67,6 +67,10 @@ void MainmenuState::Draw()
 	m_xSystem.m_pxTileManager->DrawText("| |  | | | _  _|", 2, 8);
 	m_xSystem.m_pxTileManager->DrawText("|\\|/\\|-|-|/.|/ |/", 2, 9);
 	m_xSystem.m_pxTileManager->DrawText("| |\\/\\_| |\\_|\\_|\\", 2, 10);
+
+	m_xSystem.m_pxTileManager->DrawText("Controls:", 2, 29);
+	m_xSystem.m_pxTileManager->DrawText("Arrow keys or numpad to move/attack", 2, 30);
+	m_xSystem.m_pxTileManager->DrawText("Enter to go down a floor", 2, 31);
 	{
 		int i = 0;
 		auto it = m_asMenu.begin();
